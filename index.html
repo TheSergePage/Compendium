@@ -1,1 +1,71 @@
-<h1>Hello</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <title>DVRB PROJECT | COMPENDIUM</title>
+
+    <link href="Resources/Fonts/Manrope/manrope.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:300,400,500,600,700,900&display=swap&subset=cyrillic,cyrillic-ext,greek,latin-ext,vietnamese" rel="stylesheet">
+
+    <link href="Resources/CSS/Style.css" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <img src="Resources/Images/Logo.png" width="41.6" height="48">
+        <span class="ps-logotype">COMPENDIUM</span>
+    </header>
+
+    <main>
+        <article class="ps-contentSection">
+            <h2>WHAT IS IT</h2>
+            <div>
+                <span><b>Compendium</b> is a static library which include a configurator for edit files.<br>The library include:</span>
+                <ul class="ps-list">
+                    <li><span>Two class for control data</span></li>
+                    <li><span>Class configurator for control a file</span></li>
+                </ul>
+
+                <span>The library availalbe for <b>Windows only</b>, no plans to port it.</span>
+
+                <span>Compendium files can be structured or <i>flat</i> (only units). Take a look at examples below:</span>
+
+                <code class="ps-codePreview">
+                    <pre><- Flat structure -><br>unit FirstName:Serge<br>unit SecondName:Page</pre>
+                </code>
+                <span class="ps-codeDescription">flat structure</span>
+
+                <code class="ps-codePreview">
+                    <pre>group Character [<br>  <-<br>  This is a configuration<br>  of the fictional character<br>  -><br><br>  unit FirstName:Serge<br>  unit SecondName:Page<br>  unit Age:21<br><br>  group Equipment [<br>    <-<br>    Equipment:<br>    0 - Empty<br>    1 - Pistol<br>    2 - Shotgun<br>    3 - Rifle<br>    -><br><br>    unit LeftHand:2<br>    unit RightHand:0<br>  ]<br>]</pre>
+                </code>
+                <span class="ps-codeDescription">classic structure</span>
+            </div>
+        </article>
+
+        <article class="ps-contentSection">
+            <h2>PROJECT GOAL</h2>
+            <div>
+                <span>The main goal - create a structured configuration format which can be pretty useful for store settings of characters in a game or another purposes but only for store.</span>
+            </div>
+        </article>
+
+        <article class="ps-contentSection">
+            <h2>LINKS</h2>
+            <div>
+                <span>Useful links:</span>
+                <ul class="ps-list">
+                    <li><a href="#" class="ps-link">Project repository</a></li>
+                    <li><a href="#" class="ps-link">Project Wiki</a></li>
+                    <li><a href="#" class="ps-link">Author profile</a></li>
+                </ul>
+            </div>
+        </article>
+    </main>
+
+    <footer>
+        <span class="ps-copyright">© 2019, Dark Orb</span>
+    </footer>
+</body>
+</html>
