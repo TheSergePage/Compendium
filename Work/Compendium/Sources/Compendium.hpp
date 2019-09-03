@@ -16,7 +16,7 @@ This license is require to:
 This license is deny to:
 1. Change license of the derivative software
 2. Use the copyright holder name and name of any contributor of this software for advertising derivative software without legally certified permission
-3. Sell this software without an author legally certified permission 
+3. Sell this software without an author legally certified permission
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,

@@ -16,7 +16,7 @@ This license is require to:
 This license is deny to:
 1. Change license of the derivative software
 2. Use the copyright holder name and name of any contributor of this software for advertising derivative software without legally certified permission
-3. Sell this software without an author legally certified permission 
+3. Sell this software without an author legally certified permission
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -66,7 +66,7 @@ void fShowGroup( const CGroup *_Group, const size_t _Level ) {
   wcout << L"Inner units:";
 
   if( _Group->fGetUnits().size() == 0 )
-    wcout << L" Have no units" << endl;
+    wcout << L" No units" << endl;
   else {
     wcout << endl;
 
@@ -81,7 +81,7 @@ void fShowGroup( const CGroup *_Group, const size_t _Level ) {
   wcout << L"Inner groups:";
 
   if( _Group->fGetGroups().size() == 0 )
-    wcout << L" Have no groups" << endl;
+    wcout << L" No groups" << endl;
   else {
     wcout << endl;
 
@@ -92,20 +92,15 @@ void fShowGroup( const CGroup *_Group, const size_t _Level ) {
 
 void fShowHowToUse() {
   wcout << L"How to use:" << endl;
-  wcout << L"-cmd - command[View/Create/Change/Encode/Decode]" << endl << endl;
-
-  wcout << L"-lpath - path to the file for load" << endl;
-  wcout << L"-spath - path to the file or folder for save" << endl << endl;
-
-  wcout << L"-tg - target group for changing" << endl;
-  wcout << L"-tu - target unit for changing" << endl << endl;
+  wcout << L"!Command - command[View/Create/Change]" << endl;
+  wcout << L"!LoadPath - path to the file for load" << endl << endl;
 }
 
 void fShowConfiguration( const CConfigurator _Configurator ) {
   wcout << L"Units:";
 
   if( _Configurator.fGetUnits().size() == 0 )
-    wcout << L"Have no units" << endl;
+    wcout << L"No units" << endl;
   else {
     wcout << endl;
 
@@ -118,7 +113,7 @@ void fShowConfiguration( const CConfigurator _Configurator ) {
   wcout << L"Groups:";
 
   if( _Configurator.fGetGroups().size() == 0 )
-    wcout << L"Have no groups" << endl;
+    wcout << L"No groups" << endl;
   else {
     wcout << endl;
 
@@ -146,21 +141,12 @@ int __cdecl main( int argc, char **argv ) {
   wstring vTargetGroup, vTargetUnit;
 
   for( size_t c = 1; c < static_cast< size_t >( argc ); c++ ) {
-    if( strcmp( argv [ c ], "-cmd" ) == 0 ) {
+    if( strcmp( argv [ c ], "!Command" ) == 0 ) {
       if( strcmp( argv [ c + 1 ], "View" ) == 0 ) {
         ++c;
         vCommand = 0;
-      }
-      else if( strcmp( argv [ c + 1 ], "Create" ) == 0 ) {
-        ++c;
-        vCommand = 1;
-      }
-      else if( strcmp( argv [ c + 1 ], "Change" ) == 0 ) {
-        ++c;
-        vCommand = 2;
-      }
-      else {
-        wcout << L">>>Invalid argument value. Argument - cmd : " << argv [ c + 1 ] << endl;
+      } else {
+        wcout << L">>>Invalid argument value. Argument - Command : " << argv [ c + 1 ] << endl;
 
         wcout << L"=========================" << endl;
 
@@ -168,20 +154,9 @@ int __cdecl main( int argc, char **argv ) {
 
         return -1;
       }
-    }
-    else if( strcmp( argv [ c ], "-lpath" ) == 0 ) {
+    } else if( strcmp( argv [ c ], "!LoadPath" ) == 0 ) {
       vLoadPath = vConverter.from_bytes( argv [ ++c ] );
-    }
-    else if( strcmp( argv [ c ], "-spath" ) == 0 ) {
-      vSavePath = vConverter.from_bytes( argv [ ++c ] );
-    }
-    else if( strcmp( argv [ c ], "-tg" ) == 0 ) {
-      vTargetGroup = vConverter.from_bytes( argv [ ++c ] );
-    }
-    else if( strcmp( argv [ c ], "-tu" ) == 0 ) {
-      vTargetUnit = vConverter.from_bytes( argv [ ++c ] );
-    }
-    else {
+    } else {
       wcout << L">>>Unknown argument. Argument - " << argv [ c ] << endl;
 
       wcout << L"=========================" << endl;
@@ -212,112 +187,6 @@ int __cdecl main( int argc, char **argv ) {
       wcout << L"Load result - " << vConfigurator.fLoadConfiguration( vLoadPath ) << endl << endl;
 
       fShowConfiguration( vConfigurator );
-    }
-    break;
-
-    //Create
-    case 1:
-    {
-      if( vSavePath.empty() ) {
-        wcout << L">>>Save path is empty" << endl;
-
-        wcout << L"=========================" << endl;
-
-        fShowHowToUse();
-
-        return -1;
-      }
-
-      CGroup *vGroup = new CGroup( wstring( L"AboutMe" ).c_str() );
-
-      vGroup->fAddUnit( new CUnit( wstring( L"myName" ).c_str(), wstring( L"Serge Page" ).c_str() ) );
-      vGroup->fAddUnit( new CUnit( wstring( L"profession" ).c_str(), wstring( L"Programmer" ).c_str() ) );
-      vGroup->fAddUnit( new CUnit( wstring( L"age" ).c_str(), wstring( L"20" ).c_str() ) );
-
-      vGroups.push_back( vGroup );
-
-      vConfigurator.fSetGroups( vGroups );
-
-      wcout << L"Save result - " << vConfigurator.fSaveConfiguration( vSavePath ) << endl;
-    }
-    break;
-
-    //Change
-    case 2:
-    {
-      if( vLoadPath.empty() ) {
-        wcout << L">>>Load path is empty" << endl;
-
-        wcout << L"=========================" << endl;
-
-        fShowHowToUse();
-
-        return -1;
-      }
-
-      if( vSavePath.empty() ) {
-        wcout << L">>>Save path is empty" << endl;
-
-        wcout << L"=========================" << endl;
-
-        fShowHowToUse();
-
-        return -1;
-      }
-
-      wcout << L"Load result - " << vConfigurator.fLoadConfiguration( vLoadPath ) << endl;
-
-      if( vTargetGroup.empty() ) {
-        wcout << L">>>Target group id is empty" << endl;
-
-        wcout << L"=========================" << endl;
-
-        fShowHowToUse();
-
-        return -1;
-      }
-
-      if( vTargetUnit.empty() ) {
-        wcout << L">>>Target unit id is empty" << endl;
-
-        wcout << L"=========================" << endl;
-
-        fShowHowToUse();
-
-        return -1;
-      }
-
-      for( CGroup *&vGroup : vConfigurator.fGetGroups() ) {
-        if( vGroup->fGetId() == vTargetGroup ) {
-          vGroup->fAddGroup( new CGroup( wstring( L"aNewGroup" ).c_str() ) );
-
-          for( CUnit *&vUnit : vGroup->fGetUnits() ) {
-            if( vUnit->fGetId() == vTargetUnit ) {
-              vUnit->fSetValue( wstring( L"It's a new value" ).c_str() );
-
-              wcout << L"Save result - " << vConfigurator.fSaveConfiguration( vSavePath ) << endl;
-
-              return 0;
-            }
-          }
-
-          wcout << L">>>The required unit not found" << endl;
-
-          wcout << L"=========================" << endl;
-
-          fShowHowToUse();
-
-          return -1;
-        }
-      }
-
-      wcout << L">>>The required group not found" << endl;
-
-      wcout << L"=========================" << endl;
-
-      fShowHowToUse();
-
-      return -1;
     }
     break;
   }
