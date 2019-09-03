@@ -6,7 +6,7 @@ This license is hereby grants to any person who obtained a copy of this software
 1. Use and do reverse-engineering of compiled version of this software at no cost, without any restrictions, in non-commercial and commercial purposes
 2. Use source codes of this software at no cost but with the limitations - source codes available only for non-commercial, academic and / or scientific purposes
 3. Copy and distribute without any fee
-4. Create a copy of the exists repository with this software for non-commercial,  academic and / or scientific purposes only
+4. Create a copy of the original repository and / or create own derivative software for non-commercial,  academic and / or scientific purposes only
 
 This license is require to:
 1. Keep the full license text without any changes
