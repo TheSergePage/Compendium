@@ -10,7 +10,7 @@ This license is hereby grants to any person who obtained a copy of this software
 
 This license is require to:
 1. Keep the full license text without any changes
-2. The license text must be included once in a file called 'License' which placed in the root directory of the software
+2. The license text must be included once in a file called 'License' which placed in the root directory of the software and in all source files of the software
 
 This license is deny to:
 1. Change license of the derivative software
