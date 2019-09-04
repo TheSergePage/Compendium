@@ -44,7 +44,7 @@ body {
     flex-direction: column;
 }
 
-@media (max-width: 1920px) {
+@media screen and (min-width: 480px) {
     body {
         width: calc(100vw - 14vw);
         height: calc(100vh - 2.2vh);
@@ -80,7 +80,7 @@ code {
     font-family: 'Source Code Pro', monospace;
 }
 
-@media (max-width: 1920px) {
+@media screen and (min-width: 480px) {
     span, a, code {
         font-size: 12pt;
     }
@@ -94,7 +94,7 @@ header {
     transition: border 0.15s ease-in-out;
 }
 
-@media (max-width: 1920px) {
+@media screen and (min-width: 480px) {
     header {
         padding-top: 2vh;
         padding-bottom: 2vh;
@@ -105,7 +105,7 @@ header {
     }
 }
 
-@media (max-width: 480px) {
+@media screen and (max-width: 480px) {
     header {
         padding-top: 2vh;
         padding-bottom: 2vh;
@@ -120,7 +120,7 @@ header {
     font-weight: 200;
 }
 
-@media (max-width: 1920px) {
+@media screen and (min-width: 480px) {
    .ps-logotype {
         margin-left: 1.3vw;
 
@@ -136,7 +136,7 @@ header {
     flex-direction: column;
 }
 
-@media (max-width: 1920px) {
+@media screen and (min-width: 480px) {
    .ps-contentSection {
         margin-top: 2vh;
         margin-bottom: 4vh;
@@ -167,7 +167,7 @@ header {
     list-style: square;
 }
 
-@media (max-width: 1920px) {
+@media screen and (min-width: 480px) {
     .ps-list {
         padding-left: 26px;
     }
@@ -178,7 +178,7 @@ header {
     color: #AEAEAE;
 }
 
-@media (max-width: 1920px) {
+@media screen and (min-width: 480px) {
     .ps-codePreview {
         margin-top: 12px;
         margin-bottom: 12px;
@@ -194,7 +194,7 @@ header {
     font-style: italic;
 }
 
-@media (max-width: 1920px) {
+@media screen and (min-width: 480px) {
     .ps-codeDescription {
         font-size: 10pt !important;
     }
@@ -216,7 +216,7 @@ footer {
     display: flex;
 }
 
-@media (max-width: 1920px) {
+@media screen and (min-width: 480px) {
     footer {
         padding-bottom: 2.2vh;
 
@@ -228,7 +228,7 @@ footer {
     color: #AEAEAE;
 }
 
-@media (max-width: 1920px) {
+@media screen and (min-width: 480px) {
     .ps-copyright {
         font-size: 9.1pt;
     }
