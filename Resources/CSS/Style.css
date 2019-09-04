@@ -34,25 +34,20 @@ Palette:
 */
 
 body {
+    width: calc(100vw - 14vw);
+    height: calc(100vh - 2.2vh);
+
     margin: 0;
     padding: 0;
+    padding-top: 2.2vh;
+    padding-left: 6vw;
+    padding-right: 6vw;
 
     background-color: #070707;
 
     display: flex;
 
     flex-direction: column;
-}
-
-@media screen and (min-width: 480px) {
-    body {
-        width: calc(100vw - 14vw);
-        height: calc(100vh - 2.2vh);
-
-        padding-top: 2.2vh;
-        padding-left: 6vw;
-        padding-right: 6vw;
-    }
 }
 
 span, a,
@@ -73,6 +68,7 @@ code {
 }
 
 span, a, code {
+    font-size: 12pt;
     font-weight: 400;
 }
 
@@ -80,29 +76,19 @@ code {
     font-family: 'Source Code Pro', monospace;
 }
 
-@media screen and (min-width: 480px) {
-    span, a, code {
-        font-size: 12pt;
-    }
-}
-
 header {
+    padding-top: 2vh;
+    padding-bottom: 2vh;
+
     display: flex;
+
+    flex-direction: row;
+
+    align-items: center;
 
     border-bottom: 1px solid #1A1A1A;
 
     transition: border 0.15s ease-in-out;
-}
-
-@media screen and (min-width: 480px) {
-    header {
-        padding-top: 2vh;
-        padding-bottom: 2vh;
-
-        flex-direction: row;
-
-        align-items: center;
-    }
 }
 
 @media screen and (max-width: 480px) {
@@ -117,40 +103,31 @@ header {
 }
 
 .ps-logotype {
+    margin-left: 1.3vw;
+
+    font-size: 32pt;
     font-weight: 200;
-}
 
-@media screen and (min-width: 480px) {
-   .ps-logotype {
-        margin-left: 1.3vw;
-
-        font-size: 32pt;
-
-        letter-spacing: 3pt;
-    }
+    letter-spacing: 3pt;
 }
 
 .ps-contentSection {
+    margin-top: 2vh;
+    margin-bottom: 4vh;
+    
     display: flex;
 
     flex-direction: column;
 }
 
-@media screen and (min-width: 480px) {
-   .ps-contentSection {
-        margin-top: 2vh;
-        margin-bottom: 4vh;
-    }
+.ps-contentSection > h2 {
+    margin-bottom: 12px;
+}
 
-    .ps-contentSection > h2 {
-        margin-bottom: 12px;
-    }
+.ps-contentSection > div > span {
+    margin-bottom: 4px;
 
-    .ps-contentSection > div > span {
-        margin-bottom: 4px;
-
-        font-size: 11.2pt;
-    }
+    font-size: 11.2pt;
 }
 
 .ps-contentSection > div {
@@ -160,6 +137,8 @@ header {
 }
 
 .ps-list {
+    padding-left: 26px;
+
     color: #FFFFFF;
 
     font-weight: 300;
@@ -167,37 +146,21 @@ header {
     list-style: square;
 }
 
-@media screen and (min-width: 480px) {
-    .ps-list {
-        padding-left: 26px;
-    }
-}
-
 .ps-codePreview {
+    margin-top: 12px;
+    margin-bottom: 12px;
+    padding-left: 32px;
+
     border-left: 1px solid #0749FF;
     color: #AEAEAE;
-}
-
-@media screen and (min-width: 480px) {
-    .ps-codePreview {
-        margin-top: 12px;
-        margin-bottom: 12px;
-
-        padding-left: 32px;
-    }
 }
 
 .ps-codeDescription {
     color: #EEEEEE;
 
+    font-size: 10pt !important;
     font-weight: 300;
     font-style: italic;
-}
-
-@media screen and (min-width: 480px) {
-    .ps-codeDescription {
-        font-size: 10pt !important;
-    }
 }
 
 .ps-link {
@@ -213,23 +176,15 @@ header {
 }
 
 footer {
+    padding-bottom: 2.2vh;
+
     display: flex;
-}
 
-@media screen and (min-width: 480px) {
-    footer {
-        padding-bottom: 2.2vh;
-
-        flex-direction: row;
-    }
+    flex-direction: row;
 }
 
 .ps-copyright {
     color: #AEAEAE;
-}
 
-@media screen and (min-width: 480px) {
-    .ps-copyright {
-        font-size: 9.1pt;
-    }
+    font-size: 9.1pt;
 }
