@@ -421,7 +421,7 @@ wstring CConfigurator::fSerializeGroup( const CGroup *_Group, const size_t _Leve
 
   vResult += L"group ";
   vResult += _Group->fGetId();
-  vResult += L" [\n";
+  vResult += L" [\r\n";
 
   for( const CUnit *vUnit : _Group->fGetUnits() ) {
     for( size_t c = 0; c < _Level + 1; c++ )
@@ -437,7 +437,7 @@ wstring CConfigurator::fSerializeGroup( const CGroup *_Group, const size_t _Leve
   for( size_t c = 0; c < _Level; c++ )
     vResult += L" ";
 
-  vResult += L"]\n\n";
+  vResult += L"]\r\n\r\n";
 
   return vResult;
 }

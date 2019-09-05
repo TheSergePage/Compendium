@@ -434,6 +434,6 @@ namespace Compendium {
     CUnit *fParseUnit( size_t &_Index );
 
     wstring fSerializeGroup( const CGroup *_Group, const size_t _Level ) const;
-    inline wstring fSerializeUnit( const CUnit *_Unit ) const { return wstring() + L"unit " + _Unit->fGetId() + L":" + _Unit->fGetValue() + L"\n"; }
+    inline wstring fSerializeUnit( const CUnit *_Unit ) const { return wstring() + L"unit " + _Unit->fGetId() + L":" + _Unit->fGetValue() + L"\r\n"; }
   };
 }
