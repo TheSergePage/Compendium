@@ -67,7 +67,7 @@ ENErrorCodes CConfigurator::FLoadBufferFromFile( const u32string &_Path ) {
   basic_ifstream<char32_t> VFile( _Path, ios::binary );
 
   VFile.seekg( 0, ios::end );
-  streampos VFileLength = VFile.tellg();
+  const streampos VFileLength = VFile.tellg();
   VFile.seekg( 0 );
 
   if( VFileLength == 0 ) {
@@ -104,7 +104,7 @@ ENErrorCodes CConfigurator::FLoadBufferFromBuffer( const u32string &_Buffer ) {
 
   FClearBuffer();
 
-  const uint32_t VSourceSize = static_cast<uint32_t>(_Buffer.length() + 1);
+  const uint32_t VSourceSize = static_cast< uint32_t >( _Buffer.length() + 1 );
 
   char32_t *VTemporaryBuffer = new char32_t [ VSourceSize ];
   VTemporaryBuffer [ VSourceSize ] = U'\0';
@@ -141,7 +141,7 @@ ENErrorCodes CConfigurator::FLoadConfigurationFromFile( const u32string &_Path )
   basic_ifstream<char32_t> VFile( _Path, ios::binary );
 
   VFile.seekg( 0, ios::end );
-  streampos VFileLength = VFile.tellg();
+  const streampos VFileLength = VFile.tellg();
   VFile.seekg( 0 );
 
   if( VFileLength == 0 ) {
@@ -214,7 +214,7 @@ ENErrorCodes CConfigurator::FLoadConfigurationFromBuffer( const u32string &_Buff
 
   FClearBuffer();
 
-  const uint32_t VSourceSize = static_cast<uint32_t>(_Buffer.length() + 1);
+  const uint32_t VSourceSize = static_cast< uint32_t >( _Buffer.length() + 1 );
 
   char32_t *VTemporaryBuffer = new char32_t [ VSourceSize ];
   VTemporaryBuffer [ VSourceSize ] = U'\0';
@@ -474,7 +474,7 @@ CUnit *CConfigurator::FParseUnit( uint32_t &_Index ) {
   return new CUnit( VId.c_str(), VValue.c_str() );
 }
 
-u32string CConfigurator::FSerializeGroup( const CGroup *&_Group, const uint32_t _Level ) const {
+u32string CConfigurator::FSerializeGroup( const CGroup *_Group, const uint32_t _Level ) const {
   u32string VResult;
 
   for( uint32_t c = 0; c < _Level; c++ )
@@ -503,6 +503,6 @@ u32string CConfigurator::FSerializeGroup( const CGroup *&_Group, const uint32_t 
   return VResult;
 }
 
-u32string CConfigurator::FSerializeUnit( const CUnit *&_Unit ) const {
+u32string CConfigurator::FSerializeUnit( const CUnit *_Unit ) const {
   return U"unit " + _Unit->FGetId() + U":" + _Unit->FGetValue() + U"\r\n";
 }

@@ -140,52 +140,52 @@ namespace Compendium {
 
     CUnit *FGetUnit( const uint32_t _Index ) const;
     CUnit *FGetUnit( const u32string &_Id, const bool _Deep = false ) const;
-    CUnit *FGetUnit( const CUnit *&_Unit, const bool _Deep = false ) const;
+    CUnit *FGetUnit( const CUnit *_Unit, const bool _Deep = false ) const;
 
-    ENErrorCodes FAddUnit( CUnit *&_Unit );
+    ENErrorCodes FAddUnit( CUnit *_Unit );
 
     CUnit *FRemoveUnit( const uint32_t _Index );
     CUnit *FRemoveUnit( const u32string &_Id, const bool _Deep = false );
 
-    ENErrorCodes FInsertUnit( CUnit *&_Unit, const uint32_t _Index );
+    ENErrorCodes FInsertUnit( CUnit *_Unit, const uint32_t _Index );
 
     int64_t FGetUnitIndex( const u32string &_Id ) const;
 
-    CUnit *FChangeUnit( const uint32_t _Index, CUnit *&_Substitute );
-    CUnit *FChangeUnit( const u32string &_Id, CUnit *&_Substitute, const bool _Deep = false );
+    CUnit *FChangeUnit( const uint32_t _Index, CUnit *_Substitute );
+    CUnit *FChangeUnit( const u32string &_Id, CUnit *_Substitute, const bool _Deep = false );
 
     //Groups
 
     CGroup *FGetGroup( const uint32_t _Index ) const;
     CGroup *FGetGroup( const u32string &_Id, const bool _Deep = false ) const;
-    CGroup *FGetGroup( const CUnit *&_Unit, const bool _Deep = false ) const;
+    CGroup *FGetGroup( const CUnit *_Unit, const bool _Deep = false ) const;
     CGroup *FGetGroup( const vector<CUnit *> &_Units, const bool _Deep = false ) const;
-    CGroup *FGetGroup( const CGroup *&_Group, const bool _Deep = false ) const;
+    CGroup *FGetGroup( const CGroup *_Group, const bool _Deep = false ) const;
     CGroup *FGetGroup( const vector<CGroup *> &_Groups, const bool _Deep = false ) const;
 
-    ENErrorCodes FAddGroup( CGroup *&_Group );
+    ENErrorCodes FAddGroup( CGroup *_Group );
 
     CGroup *FRemoveGroup( const uint32_t _Index );
     CGroup *FRemoveGroup( const u32string &_Id, const bool _Deep = false );
-    CGroup *FRemoveGroup( const CUnit *&_Unit, const bool _Deep = false );
+    CGroup *FRemoveGroup( const CUnit *_Unit, const bool _Deep = false );
     CGroup *FRemoveGroup( const vector<CUnit *> &_Units, const bool _Deep = false );
-    CGroup *FRemoveGroup( const CGroup *&_Group, const bool _Deep = false );
+    CGroup *FRemoveGroup( const CGroup *_Group, const bool _Deep = false );
     CGroup *FRemoveGroup( const vector<CGroup *> &_Groups, const bool _Deep = false );
 
     ENErrorCodes FInsertGroup( CGroup *&_Group, const uint32_t _Index );
 
     int64_t FGetGroupIndex( const u32string &_Id ) const;
-    int64_t FGetGroupIndex( const CUnit *&_Unit ) const;
+    int64_t FGetGroupIndex( const CUnit *_Unit ) const;
     int64_t FGetGroupIndex( const vector<CUnit *> &_Units ) const;
-    int64_t FGetGroupIndex( const CGroup *&_Group ) const;
+    int64_t FGetGroupIndex( const CGroup *_Group ) const;
     int64_t FGetGroupIndex( const vector<CGroup *> &_Groups ) const;
 
-    CGroup *FChangeGroup( const uint32_t _Index, CGroup *&_Substitute );
-    CGroup *FChangeGroup( const u32string &_Id, CGroup *&_Substitute, const bool _Deep = false );
-    CGroup *FChangeGroup( const CUnit *&_Unit, CGroup *&_Substitute, const bool _Deep = false );
-    CGroup *FChangeGroup( const vector<CUnit *> &_Units, CGroup *&_Substitute, const bool _Deep = false );
-    CGroup *FChangeGroup( const CGroup *&_Group, CGroup *&_Substitute, const bool _Deep = false );
-    CGroup *FChangeGroup( const vector<CGroup *> &_Groups, CGroup *&_Substitute, const bool _Deep = false );
+    CGroup *FChangeGroup( const uint32_t _Index, CGroup *_Substitute );
+    CGroup *FChangeGroup( const u32string &_Id, CGroup *_Substitute, const bool _Deep = false );
+    CGroup *FChangeGroup( const CUnit *_Unit, CGroup *_Substitute, const bool _Deep = false );
+    CGroup *FChangeGroup( const vector<CUnit *> &_Units, CGroup *_Substitute, const bool _Deep = false );
+    CGroup *FChangeGroup( const CGroup *_Group, CGroup *_Substitute, const bool _Deep = false );
+    CGroup *FChangeGroup( const vector<CGroup *> &_Groups, CGroup *_Substitute, const bool _Deep = false );
 
     private:
     u32string VId;
@@ -264,7 +264,7 @@ namespace Compendium {
     CGroup *FParseGroup( uint32_t &_Index );
     CUnit *FParseUnit( uint32_t &_Index );
 
-    u32string FSerializeGroup( const CGroup *&_Group, const uint32_t _Level ) const;
-    u32string FSerializeUnit( const CUnit *&_Unit ) const;
+    u32string FSerializeGroup( const CGroup *_Group, const uint32_t _Level ) const;
+    u32string FSerializeUnit( const CUnit *_Unit ) const;
   };
 }

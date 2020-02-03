@@ -91,7 +91,7 @@ CUnit *CGroup::FGetUnit( const u32string &_Id, const bool _Deep ) const {
   return nullptr;
 }
 
-CUnit *CGroup::FGetUnit( const CUnit *&_Unit, const bool _Deep ) const {
+CUnit *CGroup::FGetUnit( const CUnit *_Unit, const bool _Deep ) const {
   if( _Unit == nullptr )
     return nullptr;
 
@@ -136,7 +136,7 @@ CUnit *CGroup::FRemoveUnit( const u32string &_Id, const bool _Deep ) {
   return nullptr;
 }
 
-ENErrorCodes CGroup::FAddUnit( CUnit *&_Unit ) {
+ENErrorCodes CGroup::FAddUnit( CUnit *_Unit ) {
   if( _Unit == nullptr )
     return ENErrorCodes::EC_INVALID_ARGUMENT;
 
@@ -156,7 +156,7 @@ CUnit *CGroup::FRemoveUnit( const uint32_t _Index ) {
   return VGetUnit;
 }
 
-ENErrorCodes CGroup::FInsertUnit( CUnit *&_Unit, const uint32_t _Index ) {
+ENErrorCodes CGroup::FInsertUnit( CUnit *_Unit, const uint32_t _Index ) {
   if( _Unit == nullptr || _Index >= VUnits.size() )
     return ENErrorCodes::EC_INVALID_ARGUMENT;
 
@@ -174,7 +174,7 @@ int64_t CGroup::FGetUnitIndex( const u32string &_Id ) const {
   return static_cast< int64_t >( ENErrorCodes::EC_UNIT_NOT_FOUND );
 }
 
-CUnit *CGroup::FChangeUnit( const uint32_t _Index, CUnit *&_Substitute ) {
+CUnit *CGroup::FChangeUnit( const uint32_t _Index, CUnit *_Substitute ) {
   if( _Index >= VUnits.size() || _Substitute == nullptr )
     return nullptr;
 
@@ -185,7 +185,7 @@ CUnit *CGroup::FChangeUnit( const uint32_t _Index, CUnit *&_Substitute ) {
   return VGetUnit;
 }
 
-CUnit *CGroup::FChangeUnit( const u32string &_Id, CUnit *&_Substitute, const bool _Deep ) {
+CUnit *CGroup::FChangeUnit( const u32string &_Id, CUnit *_Substitute, const bool _Deep ) {
   if( _Substitute == nullptr )
     return nullptr;
 
@@ -241,7 +241,7 @@ CGroup *CGroup::FGetGroup( const u32string &_Id, const bool _Deep ) const {
   return nullptr;
 }
 
-CGroup *CGroup::FGetGroup( const CUnit *&_Unit, const bool _Deep ) const {
+CGroup *CGroup::FGetGroup( const CUnit *_Unit, const bool _Deep ) const {
   if( _Unit == nullptr )
     return nullptr;
 
@@ -287,7 +287,7 @@ CGroup *CGroup::FGetGroup( const vector<CUnit *> &_Units, const bool _Deep ) con
   return nullptr;
 }
 
-CGroup *CGroup::FGetGroup( const CGroup *&_Group, const bool _Deep ) const {
+CGroup *CGroup::FGetGroup( const CGroup *_Group, const bool _Deep ) const {
   if( _Group == nullptr )
     return nullptr;
 
@@ -333,7 +333,7 @@ CGroup *CGroup::FGetGroup( const vector<CGroup *> &_Groups, const bool _Deep ) c
   return nullptr;
 }
 
-ENErrorCodes CGroup::FAddGroup( CGroup *&_Group ) {
+ENErrorCodes CGroup::FAddGroup( CGroup *_Group ) {
   if( _Group == nullptr )
     return ENErrorCodes::EC_INVALID_ARGUMENT;
 
@@ -379,7 +379,7 @@ CGroup *CGroup::FRemoveGroup( const u32string &_Id, const bool _Deep ) {
   return nullptr;
 }
 
-CGroup *CGroup::FRemoveGroup( const CUnit *&_Unit, const bool _Deep ) {
+CGroup *CGroup::FRemoveGroup( const CUnit *_Unit, const bool _Deep ) {
   if( _Unit == nullptr )
     return nullptr;
 
@@ -435,7 +435,7 @@ CGroup *CGroup::FRemoveGroup( const vector<CUnit *> &_Units, const bool _Deep ) 
   return nullptr;
 }
 
-CGroup *CGroup::FRemoveGroup( const CGroup *&_Group, const bool _Deep ) {
+CGroup *CGroup::FRemoveGroup( const CGroup *_Group, const bool _Deep ) {
   if( _Group == nullptr )
     return nullptr;
 
@@ -512,7 +512,7 @@ int64_t CGroup::FGetGroupIndex( const u32string &_Id ) const {
   return static_cast< int64_t >( ENErrorCodes::EC_GROUP_NOT_FOUND );
 }
 
-int64_t CGroup::FGetGroupIndex( const CUnit *&_Unit ) const {
+int64_t CGroup::FGetGroupIndex( const CUnit *_Unit ) const {
   if( _Unit == nullptr )
     return static_cast< int64_t >( ENErrorCodes::EC_INVALID_ARGUMENT );
 
@@ -538,7 +538,7 @@ int64_t CGroup::FGetGroupIndex( const vector<CUnit *> &_Units ) const {
   return static_cast< int64_t >( ENErrorCodes::EC_GROUP_NOT_FOUND );
 }
 
-int64_t CGroup::FGetGroupIndex( const CGroup *&_Group ) const {
+int64_t CGroup::FGetGroupIndex( const CGroup *_Group ) const {
   if( _Group == nullptr )
     return static_cast< int64_t >( ENErrorCodes::EC_INVALID_ARGUMENT );
 
@@ -564,7 +564,7 @@ int64_t CGroup::FGetGroupIndex( const vector<CGroup *> &_Groups ) const {
   return static_cast< int64_t >( ENErrorCodes::EC_GROUP_NOT_FOUND );
 }
 
-CGroup *CGroup::FChangeGroup( const uint32_t _Index, CGroup *&_Substitute ) {
+CGroup *CGroup::FChangeGroup( const uint32_t _Index, CGroup *_Substitute ) {
   if( _Index >= VGroups.size() || _Substitute == nullptr )
     return nullptr;
 
@@ -575,7 +575,7 @@ CGroup *CGroup::FChangeGroup( const uint32_t _Index, CGroup *&_Substitute ) {
   return VGetGroup;
 }
 
-CGroup *CGroup::FChangeGroup( const u32string &_Id, CGroup *&_Substitute, const bool _Deep ) {
+CGroup *CGroup::FChangeGroup( const u32string &_Id, CGroup *_Substitute, const bool _Deep ) {
   if( _Id.empty() || _Substitute == nullptr )
     return nullptr;
 
@@ -601,7 +601,7 @@ CGroup *CGroup::FChangeGroup( const u32string &_Id, CGroup *&_Substitute, const 
   return nullptr;
 }
 
-CGroup *CGroup::FChangeGroup( const CUnit *&_Unit, CGroup *&_Substitute, const bool _Deep ) {
+CGroup *CGroup::FChangeGroup( const CUnit *_Unit, CGroup *_Substitute, const bool _Deep ) {
   if( _Unit == nullptr || _Substitute == nullptr )
     return nullptr;
 
@@ -627,7 +627,7 @@ CGroup *CGroup::FChangeGroup( const CUnit *&_Unit, CGroup *&_Substitute, const b
   return nullptr;
 }
 
-CGroup *CGroup::FChangeGroup( const vector<CUnit *> &_Units, CGroup *&_Substitute, const bool _Deep ) {
+CGroup *CGroup::FChangeGroup( const vector<CUnit *> &_Units, CGroup *_Substitute, const bool _Deep ) {
   if( _Units.empty() || _Substitute == nullptr )
     return nullptr;
 
@@ -657,7 +657,7 @@ CGroup *CGroup::FChangeGroup( const vector<CUnit *> &_Units, CGroup *&_Substitut
   return nullptr;
 }
 
-CGroup *CGroup::FChangeGroup( const CGroup *&_Group, CGroup *&_Substitute, const bool _Deep ) {
+CGroup *CGroup::FChangeGroup( const CGroup *_Group, CGroup *_Substitute, const bool _Deep ) {
   if( _Group == nullptr || _Substitute == nullptr )
     return nullptr;
 
@@ -683,7 +683,7 @@ CGroup *CGroup::FChangeGroup( const CGroup *&_Group, CGroup *&_Substitute, const
   return nullptr;
 }
 
-CGroup *CGroup::FChangeGroup( const vector<CGroup *> &_Groups, CGroup *&_Substitute, const bool _Deep ) {
+CGroup *CGroup::FChangeGroup( const vector<CGroup *> &_Groups, CGroup *_Substitute, const bool _Deep ) {
   if( _Groups.empty() || _Substitute == nullptr )
     return nullptr;
 
