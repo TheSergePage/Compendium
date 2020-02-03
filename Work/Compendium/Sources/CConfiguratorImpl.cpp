@@ -1,365 +1,426 @@
 /*
-© 2019, Dark Orb.
+© 2019, Serge Page.
 
-The license version - 1.0
+This license is hereby grants to any person who obtained a copy of this product or the product source files the next rights to:
 
-This license is hereby grants to any person who obtained a copy of this software the next rights to:
-1. Use and do reverse-engineering of compiled version of this software at no cost, without any restrictions, in non-commercial and commercial purposes
-2. Use source codes of this software at no cost but with the limitations - source codes available only for non-commercial, academic and / or scientific purposes
-3. Copy and distribute without any fee
-4. Create a copy of the original repository and / or create own derivative software for non-commercial,  academic and / or scientific purposes only
+- Use a compiled version of this product at no cost, without any restrictions, in non-commercial and commercial purposes
+- Do reverse-engineering of this product in non-commercial purposes only
+- Use source codes of this product at no cost but with the limitations - source codes available only for non-commercial, academic and / or scientific purposes
+- Copy and distribute without any fee
+- Copy of the original repository and / or create own derivative product for non-commercial,  academic and / or scientific purposes only
+- Link the product source code with an another product source code which licensed under any of Dark Orb licenses or one of these licenses:
+  - MIT License
+  - Microsoft Public License
+  - Beerware License
+  - Academic Free License
+  - WTFPL
+  - Unlicense
+  - Original BSD license
+  - Modified BSD License
+  - Simplified BSD License
+  - Zero Clause BSD
+- Link the product source code with an another product source code if between them no any patent collision
 
 This license is require to:
-1. Keep the full license text without any changes
-2. The license text must be included once in a file called 'License' which placed in the root directory of the software and in all source files of the software
+
+- Keep the full license text without any changes
+- The license text must be included once in a file called 'License' which placed in the root directory of the product and in all source files of the product
 
 This license is deny to:
-1. Change license of the derivative software
-2. Use the copyright holder name and name of any contributor of this software for advertising derivative software without legally certified permission
-3. Sell this software without an author legally certified permission
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+- Change license of the derivative product
+- Use the product’s author name and name of any contributor of this product for advertising derivative software without legally certified permission
+- Resell this product
+- Use the product or the product source code for any purpose which refers to any government of any country
+
+The product is an original source codes and original compiled files which made by the original author and provided only under the grants and restrictions of this license. All damages which can be happen after and while using the product will not be compensate.
 */
 
 #include "Compendium.hpp"
 
 using namespace Compendium;
 
+#include "Unicoder.hpp"
+
+using namespace Unicoder;
+
 CConfigurator::CConfigurator() noexcept:
-  vBuffer( nullptr ) {}
+  VBuffer( U"" ) {}
 
 CConfigurator::~CConfigurator() {
-  fClearBuffer();
+  FClearBuffer();
 
-  vUnits.clear();
-  vGroups.clear();
+  VUnits.clear();
+  VGroups.clear();
 }
 
-enErrorCode CConfigurator::fLoadBuffer( const wstring _Path ) {
+ENErrorCodes CConfigurator::FLoadBufferFromFile( const u32string &_Path ) {
   if( _Path.empty() ||
       !exists( _Path ) || !directory_entry( _Path ).is_regular_file() )
-    return EC_INVALID_PATH;
+    return ENErrorCodes::EC_INVALID_PATH;
 
-  if( !fIsCompendiumFile( _Path ) )
-    return EC_NOT_COMPENDIUM_FILE;
+  if( !FIsCompendiumFile( _Path ) )
+    return ENErrorCodes::EC_NOT_COMPENDIUM_FILE;
 
-  fClearBuffer();
+  FClearBuffer();
 
-  wifstream vFile( _Path, ios::binary );
+  basic_ifstream<char32_t> VFile( _Path, ios::binary );
 
-  vFile.seekg( 0, ios::end );
-  streampos vFileLength = vFile.tellg();
-  vFile.seekg( 0 );
+  VFile.seekg( 0, ios::end );
+  streampos VFileLength = VFile.tellg();
+  VFile.seekg( 0 );
 
-  if( vFileLength == 0 ) {
-    vFile.close();
+  if( VFileLength == 0 ) {
+    VFile.close();
 
-    return EC_EMPTY_FILE;
+    return ENErrorCodes::EC_EMPTY_FILE;
   }
 
-  vBuffer = new wchar_t [ static_cast< uint32_t >( vFileLength ) + 1 ];
+  char32_t *VTemporaryBuffer = new char32_t [ static_cast< uint32_t >( VFileLength ) + 1 ];
+  VTemporaryBuffer [ static_cast< uint32_t >( VFileLength ) ] = U'\0';
 
-  vFile.read( vBuffer, vFileLength );
+  VFile.read( VTemporaryBuffer, VFileLength );
 
-  vFile.close();
+  VFile.close();
 
-  if( wcslen( vBuffer ) == 0 ) {
-    fClearBuffer();
+  if( char_traits<char32_t>::length( VTemporaryBuffer ) == 0 ) {
+    delete[] VTemporaryBuffer;
+    VTemporaryBuffer = nullptr;
 
-    return EC_INVALID_READ;
+    return ENErrorCodes::EC_INVALID_READ;
   }
 
-  return EC_OK;
+  VBuffer = move( VTemporaryBuffer );
+
+  delete[] VTemporaryBuffer;
+  VTemporaryBuffer = nullptr;
+
+  return ENErrorCodes::EC_OK;
 }
 
-enErrorCode CConfigurator::fLoadBuffer( const wchar_t *_Buffer ) {
-  if( _Buffer == nullptr )
-    return EC_INVALID_ARGUMENT;
+ENErrorCodes CConfigurator::FLoadBufferFromBuffer( const u32string &_Buffer ) {
+  if( _Buffer.empty() )
+    return ENErrorCodes::EC_INVALID_ARGUMENT;
 
-  fClearBuffer();
+  FClearBuffer();
 
-  size_t vSourceSize = wcslen( _Buffer ) + 1;
+  const uint32_t VSourceSize = static_cast<uint32_t>(_Buffer.length() + 1);
 
-  vBuffer = new wchar_t [ vSourceSize ];
+  char32_t *VTemporaryBuffer = new char32_t [ VSourceSize ];
+  VTemporaryBuffer [ VSourceSize ] = U'\0';
 
-  wcscpy_s( vBuffer, vSourceSize, _Buffer );
-
-  if( wcslen( vBuffer ) == 0 ) {
-    fClearBuffer();
-
-    return EC_INVALID_READ;
+  for( uint32_t c = 0; c < VSourceSize - 1; c++ ) {
+    VTemporaryBuffer [ c ] = _Buffer [ c ];
   }
 
-  return EC_OK;
+  if( char_traits<char32_t>::length( VTemporaryBuffer ) == 0 ) {
+    delete[] VTemporaryBuffer;
+    VTemporaryBuffer = nullptr;
+
+    return ENErrorCodes::EC_INVALID_READ;
+  }
+
+  VBuffer = move( VTemporaryBuffer );
+
+  delete[] VTemporaryBuffer;
+  VTemporaryBuffer = nullptr;
+
+  return ENErrorCodes::EC_OK;
 }
 
-enErrorCode CConfigurator::fLoadConfiguration( const wstring _Path ) {
+ENErrorCodes CConfigurator::FLoadConfigurationFromFile( const u32string &_Path ) {
   if( _Path.empty() ||
       !exists( _Path ) || !directory_entry( _Path ).is_regular_file() )
-    return EC_INVALID_PATH;
+    return ENErrorCodes::EC_INVALID_PATH;
 
-  if( !fIsCompendiumFile( _Path ) )
-    return EC_NOT_COMPENDIUM_FILE;
+  if( !FIsCompendiumFile( _Path ) )
+    return ENErrorCodes::EC_NOT_COMPENDIUM_FILE;
 
-  fClearBuffer();
+  FClearBuffer();
 
-  wifstream vFile( _Path, ios::binary );
+  basic_ifstream<char32_t> VFile( _Path, ios::binary );
 
-  vFile.seekg( 0, ios::end );
-  streampos vFileLength = vFile.tellg();
-  vFile.seekg( 0 );
+  VFile.seekg( 0, ios::end );
+  streampos VFileLength = VFile.tellg();
+  VFile.seekg( 0 );
 
-  if( vFileLength == 0 ) {
-    vFile.close();
+  if( VFileLength == 0 ) {
+    VFile.close();
 
-    return EC_EMPTY_FILE;
+    return ENErrorCodes::EC_EMPTY_FILE;
   }
 
-  vBuffer = new wchar_t [ static_cast< uint32_t >( vFileLength ) + 1 ];
+  char32_t *VTemporaryBuffer = new char32_t [ static_cast< uint32_t >( VFileLength ) + 1 ];
+  VTemporaryBuffer [ static_cast< uint32_t >( VFileLength ) ] = U'\0';
 
-  vFile.read( vBuffer, vFileLength );
+  VFile.read( VTemporaryBuffer, VFileLength );
 
-  vFile.close();
+  VFile.close();
 
-  if( wcslen( vBuffer ) == 0 ) {
-    fClearBuffer();
+  if( char_traits<char32_t>::length( VTemporaryBuffer ) == 0 ) {
+    delete[] VTemporaryBuffer;
+    VTemporaryBuffer = nullptr;
 
-    return EC_INVALID_READ;
+    return ENErrorCodes::EC_INVALID_READ;
   }
 
-  for( size_t c = 0; c < wcslen( vBuffer ); c++ ) {
-    if( vBuffer [ c ] == L'<' && vBuffer [ c + 1 ] == L'-' ) {
+  VBuffer = move( VTemporaryBuffer );
+
+  delete[] VTemporaryBuffer;
+  VTemporaryBuffer = nullptr;
+
+  for( uint32_t c = 0; c < VBuffer.length(); c++ ) {
+    if( VBuffer [ c ] == U'<' && VBuffer [ c + 1 ] == U'-' ) {
       c += 2;
-      fSkipComment( c );
+      FSkipComment( c );
     }
 
-    switch( fGetNextKeyword( c ) ) {
-      case K_GROUP:
+    switch( FGetNextKeyword( c ) ) {
+      case static_cast< int64_t >( ENKeywords::K_GROUP ) :
       {
-        CGroup *vGetGroup = fParseGroup( c );
+        CGroup *VGetGroup = FParseGroup( c );
 
-        if( vGetGroup != nullptr )
-          vGroups.push_back( vGetGroup );
+        if( VGetGroup != nullptr )
+          VGroups.push_back( VGetGroup );
         else
-          return EC_INVALID_PARSE;
+          return ENErrorCodes::EC_INVALID_PARSE;
       }
       break;
 
-      case K_UNIT:
+      case static_cast< int64_t >( ENKeywords::K_UNIT ) :
       {
-        CUnit *vGetUnit = fParseUnit( c );
+        CUnit *VGetUnit = FParseUnit( c );
 
-        if( vGetUnit != nullptr )
-          vUnits.push_back( vGetUnit );
+        if( VGetUnit != nullptr )
+          VUnits.push_back( VGetUnit );
         else
-          return EC_INVALID_PARSE;
+          return ENErrorCodes::EC_INVALID_PARSE;
       }
       break;
     }
   }
 
-  fClearBuffer();
+  FClearBuffer();
 
-  return EC_OK;
+  return ENErrorCodes::EC_OK;
 }
 
-enErrorCode CConfigurator::fLoadConfiguration( const wchar_t *_Buffer, const size_t _StartIndex ) {
-  if( _Buffer == nullptr )
-    return EC_INVALID_ARGUMENT;
+ENErrorCodes CConfigurator::FLoadConfigurationFromBuffer( const u32string &_Buffer, const uint32_t _StartIndex ) {
+  if( _Buffer.empty() )
+    return ENErrorCodes::EC_INVALID_ARGUMENT;
 
-  if( _StartIndex >= wcslen( _Buffer ) )
-    return EC_INVALID_START_INDEX;
+  if( _StartIndex >= _Buffer.length() )
+    return ENErrorCodes::EC_INVALID_START_INDEX;
 
-  fClearBuffer();
+  FClearBuffer();
 
-  size_t vSourceSize = wcslen( _Buffer ) + 1;
+  const uint32_t VSourceSize = static_cast<uint32_t>(_Buffer.length() + 1);
 
-  vBuffer = new wchar_t [ vSourceSize ];
+  char32_t *VTemporaryBuffer = new char32_t [ VSourceSize ];
+  VTemporaryBuffer [ VSourceSize ] = U'\0';
 
-  wcscpy_s( vBuffer, vSourceSize, _Buffer );
-
-  if( wcslen( vBuffer ) == 0 ) {
-    fClearBuffer();
-
-    return EC_INVALID_READ;
+  for( uint32_t c = 0; c < VSourceSize - 1; c++ ) {
+    VTemporaryBuffer [ c ] = _Buffer [ c ];
   }
 
-  for( size_t c = _StartIndex; c < wcslen( vBuffer ); c++ ) {
-    if( vBuffer [ c ] == L'<' && vBuffer [ c + 1 ] == L'-' ) {
+  if( char_traits<char32_t>::length( VTemporaryBuffer ) == 0 ) {
+    delete[] VTemporaryBuffer;
+    VTemporaryBuffer = nullptr;
+
+    return ENErrorCodes::EC_INVALID_READ;
+  }
+
+  VBuffer = VTemporaryBuffer;
+
+  delete[] VTemporaryBuffer;
+  VTemporaryBuffer = nullptr;
+
+  for( uint32_t c = _StartIndex; c < VBuffer.length(); c++ ) {
+    if( VBuffer [ c ] == U'<' && VBuffer [ c + 1 ] == U'-' ) {
       c += 2;
-      fSkipComment( c );
+      FSkipComment( c );
     }
 
-    switch( fGetNextKeyword( c ) ) {
-      case K_GROUP:
+    switch( FGetNextKeyword( c ) ) {
+      case static_cast< int64_t >( ENKeywords::K_GROUP ) :
       {
-        CGroup *vGetGroup = fParseGroup( c );
+        CGroup *VGetGroup = FParseGroup( c );
 
-        if( vGetGroup != nullptr )
-          vGroups.push_back( vGetGroup );
+        if( VGetGroup != nullptr )
+          VGroups.push_back( VGetGroup );
         else
-          return EC_INVALID_PARSE;
+          return ENErrorCodes::EC_INVALID_PARSE;
       }
       break;
 
-      case K_UNIT:
+      case static_cast< int64_t >( ENKeywords::K_UNIT ) :
       {
-        CUnit *vGetUnit = fParseUnit( c );
+        CUnit *VGetUnit = FParseUnit( c );
 
-        if( vGetUnit != nullptr )
-          vUnits.push_back( vGetUnit );
+        if( VGetUnit != nullptr )
+          VUnits.push_back( VGetUnit );
         else
-          return EC_INVALID_PARSE;
+          return ENErrorCodes::EC_INVALID_PARSE;
       }
       break;
     }
   }
 
-  fClearBuffer();
+  FClearBuffer();
 
-  return EC_OK;
+  return ENErrorCodes::EC_OK;
 }
 
-enErrorCode CConfigurator::fSaveConfiguration( const wstring _Path ) {
-  if( _Path.empty() || directory_entry( _Path + L".cconf" ).is_directory() )
-    return EC_INVALID_PATH;
+ENErrorCodes CConfigurator::FSaveConfigurationToFile( const u32string &_Path ) {
+  if( _Path.empty() || directory_entry( _Path + U".cconf" ).is_directory() )
+    return ENErrorCodes::EC_INVALID_PATH;
 
-  wstring vData;
+  u32string VData;
 
-  for( const CUnit *vUnit : vUnits )
-    vData += fSerializeUnit( vUnit );
+  for( const CUnit *VUnit : VUnits )
+    VData += FSerializeUnit( VUnit );
 
-  for( const CGroup *vGroup : vGroups )
-    vData += fSerializeGroup( vGroup, 0 );
+  for( const CGroup *VGroup : VGroups )
+    VData += FSerializeGroup( VGroup, 0 );
 
-  wofstream vFile( _Path + L".cconf", ios::binary | ios::trunc );
+  basic_ofstream<char32_t> VFile( _Path + U".cconf", ios::binary | ios::trunc );
 
-  vFile.write( vData.c_str(), vData.length() );
+  VFile.write( VData.c_str(), VData.length() );
 
-  vFile.close();
+  VFile.close();
 
-  vData.clear();
+  VData.clear();
 
-  return EC_OK;
+  return ENErrorCodes::EC_OK;
 }
 
-enErrorCode CConfigurator::fSaveBuffer( wstring &_Buffer ) {
-  wstring vData;
+ENErrorCodes CConfigurator::FSaveConfigurationToBuffer( u32string &_Buffer ) {
+  u32string VData;
 
-  for( const CUnit *vUnit : vUnits )
-    vData += fSerializeUnit( vUnit );
+  for( const CUnit *VUnit : VUnits )
+    VData += FSerializeUnit( VUnit );
 
-  for( const CGroup *vGroup : vGroups )
-    vData += fSerializeGroup( vGroup, 0 );
+  for( const CGroup *VGroup : VGroups )
+    VData += FSerializeGroup( VGroup, 0 );
 
-  _Buffer = vData;
+  _Buffer = move( VData );
 
-  vData.clear();
-
-  return EC_OK;
+  return ENErrorCodes::EC_OK;
 }
 
-long CConfigurator::fGetNextKeyword( size_t &_Index ) const noexcept {
-  if( vBuffer [ _Index ] == L'g' &&
-      vBuffer [ _Index + 1 ] == L'r' &&
-      vBuffer [ _Index + 2 ] == L'o' &&
-      vBuffer [ _Index + 3 ] == L'u' &&
-      vBuffer [ _Index + 4 ] == L'p' ) {
+bool CConfigurator::FIsCompendiumFile( const u32string &_Path ) const noexcept {
+  const u32string VGetExtension = path( UConverter::FConvert<u32string, char32_t, wstring, wchar_t>( _Path ) ).extension().u32string();
+
+  if( VGetExtension == VDefaultExtension )
+    return true;
+
+  return false;
+}
+
+void CConfigurator::FSkipComment( uint32_t &_Index ) noexcept {
+  for( uint32_t c = _Index + 1; c < VBuffer.length(); c++ ) {
+    if( VBuffer [ c ] == U'-' && VBuffer [ c + 1 ] == U'>' ) {
+      _Index = c + 2;
+      return;
+    }
+  }
+}
+
+int64_t CConfigurator::FGetNextKeyword( uint32_t &_Index ) const noexcept {
+  if( VBuffer [ _Index ] == U'g' &&
+      VBuffer [ _Index + 1 ] == U'r' &&
+      VBuffer [ _Index + 2 ] == U'o' &&
+      VBuffer [ _Index + 3 ] == U'u' &&
+      VBuffer [ _Index + 4 ] == U'p' ) {
     _Index += 5;
 
-    return K_GROUP;
+    return static_cast< int64_t >( ENKeywords::K_GROUP );
   }
 
-  if( vBuffer [ _Index ] == L'u' &&
-      vBuffer [ _Index + 1 ] == L'n' &&
-      vBuffer [ _Index + 2 ] == L'i' &&
-      vBuffer [ _Index + 3 ] == L't' ) {
+  if( VBuffer [ _Index ] == U'u' &&
+      VBuffer [ _Index + 1 ] == U'n' &&
+      VBuffer [ _Index + 2 ] == U'i' &&
+      VBuffer [ _Index + 3 ] == U't' ) {
     _Index += 4;
 
-    return K_UNIT;
+    return static_cast< int64_t >( ENKeywords::K_UNIT );
   }
 
-  return EC_NOT_FOUND_KEYWORD;
+  return static_cast< int64_t >( ENErrorCodes::EC_NOT_FOUND_KEYWORD );
 }
 
-CGroup *CConfigurator::fParseGroup( size_t &_Index ) {
-  if( vBuffer [ _Index ] != L' ' )
+CGroup *CConfigurator::FParseGroup( uint32_t &_Index ) {
+  if( VBuffer [ _Index ] != U' ' )
     return nullptr;
 
-  wstring vId;
-  vector<CGroup *> vInnerGroups;
-  vector<CUnit *> vInnerUnits;
+  u32string VId;
+  vector<CGroup *> VInnerGroups;
+  vector<CUnit *> VInnerUnits;
 
-  size_t c = _Index + 1;
+  uint32_t c = _Index + 1;
 
-  for( ; c < wcslen( vBuffer ); c++ ) {
-    if( vBuffer [ c ] == L'<' && vBuffer [ c + 1 ] == L'-' ) {
+  for( ; c < VBuffer.length(); c++ ) {
+    if( VBuffer [ c ] == U'<' && VBuffer [ c + 1 ] == U'-' ) {
       c += 2;
-      fSkipComment( c );
+      FSkipComment( c );
     }
 
-    if( vBuffer [ c ] == L' ' ) {
+    if( VBuffer [ c ] == U' ' ) {
       ++c;
       break;
     } else
-      vId += vBuffer [ c ];
+      VId += VBuffer [ c ];
   }
 
-  if( vId.empty() )
+  if( VId.empty() )
     return nullptr;
 
-  if( vBuffer [ c ] != L'[' ) {
-    vId.clear();
+  if( VBuffer [ c ] != U'[' ) {
+    VId.clear();
 
     return nullptr;
   }
 
   ++c;
 
-  for( ; c < wcslen( vBuffer ); c++ ) {
-    if( vBuffer [ c ] == L'<' && vBuffer [ c + 1 ] == L'-' ) {
+  for( ; c < VBuffer.length(); c++ ) {
+    if( VBuffer [ c ] == U'<' && VBuffer [ c + 1 ] == U'-' ) {
       c += 2;
-      fSkipComment( c );
+      FSkipComment( c );
     }
 
-    if( vBuffer [ c ] == L']' )
+    if( VBuffer [ c ] == U']' )
       break;
 
-    switch( fGetNextKeyword( c ) ) {
-      case K_GROUP:
+    switch( FGetNextKeyword( c ) ) {
+      case static_cast< int64_t >( ENKeywords::K_GROUP ) :
       {
-        CGroup *vGetGroup = fParseGroup( c );
+        CGroup *VGetGroup = FParseGroup( c );
 
-        if( vGetGroup != nullptr )
-          vInnerGroups.push_back( vGetGroup );
+        if( VGetGroup != nullptr )
+          VInnerGroups.push_back( VGetGroup );
         else {
-          vId.clear();
+          VId.clear();
 
-          vInnerGroups.clear();
-          vInnerUnits.clear();
+          VInnerGroups.clear();
+          VInnerUnits.clear();
 
           return nullptr;
         }
       }
       break;
 
-      case K_UNIT:
+      case static_cast< int64_t >( ENKeywords::K_UNIT ) :
       {
-        CUnit *vGetUnit = fParseUnit( c );
+        CUnit *VGetUnit = FParseUnit( c );
 
-        if( vGetUnit != nullptr )
-          vInnerUnits.push_back( vGetUnit );
+        if( VGetUnit != nullptr )
+          VInnerUnits.push_back( VGetUnit );
         else {
-          vId.clear();
+          VId.clear();
 
-          vInnerGroups.clear();
-          vInnerUnits.clear();
+          VInnerGroups.clear();
+          VInnerUnits.clear();
 
           return nullptr;
         }
@@ -370,74 +431,78 @@ CGroup *CConfigurator::fParseGroup( size_t &_Index ) {
 
   _Index = c;
 
-  return new CGroup( vId.c_str(), vInnerGroups, vInnerUnits );
+  return new CGroup( VId.c_str(), VInnerGroups, VInnerUnits );
 }
 
-CUnit *CConfigurator::fParseUnit( size_t &_Index ) {
-  if( vBuffer [ _Index ] != L' ' )
+CUnit *CConfigurator::FParseUnit( uint32_t &_Index ) {
+  if( VBuffer [ _Index ] != U' ' )
     return nullptr;
 
-  wstring vId, vValue;
+  u32string VId, VValue;
 
-  size_t c = _Index + 1;
+  uint32_t c = _Index + 1;
 
-  for( ; c < wcslen( vBuffer ); c++ ) {
-    if( vBuffer [ c ] == L':' ) {
+  for( ; c < VBuffer.length(); c++ ) {
+    if( VBuffer [ c ] == U':' ) {
       ++c;
       break;
     } else
-      vId += vBuffer [ c ];
+      VId += VBuffer [ c ];
   }
 
-  if( vId.empty() )
+  if( VId.empty() )
     return nullptr;
 
-  for( ; c < wcslen( vBuffer ); c++ ) {
-    if( vBuffer [ c ] == L'\n' )
+  for( ; c < VBuffer.length(); c++ ) {
+    if( VBuffer [ c ] == U'\n' )
       break;
-    else if( vBuffer [ c ] == L'\r' && vBuffer [ c + 1 ] == L'\n' ) {
+    else if( VBuffer [ c ] == U'\r' && VBuffer [ c + 1 ] == U'\n' ) {
       ++c;
       break;
     } else
-      vValue += vBuffer [ c ];
+      VValue += VBuffer [ c ];
   }
 
-  if( vValue.length() == 0 ) {
-    vId.clear();
+  if( VValue.length() == 0 ) {
+    VId.clear();
 
     return nullptr;
   }
 
   _Index = c;
 
-  return new CUnit( vId.c_str(), vValue.c_str() );
+  return new CUnit( VId.c_str(), VValue.c_str() );
 }
 
-wstring CConfigurator::fSerializeGroup( const CGroup *_Group, const size_t _Level ) const {
-  wstring vResult;
+u32string CConfigurator::FSerializeGroup( const CGroup *&_Group, const uint32_t _Level ) const {
+  u32string VResult;
 
-  for( size_t c = 0; c < _Level; c++ )
-    vResult += L" ";
+  for( uint32_t c = 0; c < _Level; c++ )
+    VResult += U" ";
 
-  vResult += L"group ";
-  vResult += _Group->fGetId();
-  vResult += L" [\r\n";
+  VResult += U"group ";
+  VResult += _Group->FGetId();
+  VResult += U" [\r\n";
 
-  for( const CUnit *vUnit : _Group->fGetUnits() ) {
-    for( size_t c = 0; c < _Level + 1; c++ )
-      vResult += L" ";
+  for( const CUnit *VUnit : _Group->FGetUnits() ) {
+    for( uint32_t c = 0; c < _Level + 1; c++ )
+      VResult += U" ";
 
-    vResult += fSerializeUnit( vUnit );
+    VResult += FSerializeUnit( VUnit );
   }
 
-  for( const CGroup *vGroup : _Group->fGetGroups() ) {
-    vResult += fSerializeGroup( vGroup, _Level + 1 );
+  for( const CGroup *VGroup : _Group->FGetGroups() ) {
+    VResult += FSerializeGroup( VGroup, _Level + 1 );
   }
 
-  for( size_t c = 0; c < _Level; c++ )
-    vResult += L" ";
+  for( uint32_t c = 0; c < _Level; c++ )
+    VResult += U" ";
 
-  vResult += L"]\r\n\r\n";
+  VResult += U"]\r\n\r\n";
 
-  return vResult;
+  return VResult;
+}
+
+u32string CConfigurator::FSerializeUnit( const CUnit *&_Unit ) const {
+  return U"unit " + _Unit->FGetId() + U":" + _Unit->FGetValue() + U"\r\n";
 }

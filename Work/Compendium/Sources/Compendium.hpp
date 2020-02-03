@@ -1,30 +1,39 @@
 /*
-© 2019, Dark Orb.
+© 2019, Serge Page.
 
-The license version - 1.0
+This license is hereby grants to any person who obtained a copy of this product or the product source files the next rights to:
 
-This license is hereby grants to any person who obtained a copy of this software the next rights to:
-1. Use and do reverse-engineering of compiled version of this software at no cost, without any restrictions, in non-commercial and commercial purposes
-2. Use source codes of this software at no cost but with the limitations - source codes available only for non-commercial, academic and / or scientific purposes
-3. Copy and distribute without any fee
-4. Create a copy of the original repository and / or create own derivative software for non-commercial,  academic and / or scientific purposes only
+- Use a compiled version of this product at no cost, without any restrictions, in non-commercial and commercial purposes
+- Do reverse-engineering of this product in non-commercial purposes only
+- Use source codes of this product at no cost but with the limitations - source codes available only for non-commercial, academic and / or scientific purposes
+- Copy and distribute without any fee
+- Copy of the original repository and / or create own derivative product for non-commercial,  academic and / or scientific purposes only
+- Link the product source code with an another product source code which licensed under any of Dark Orb licenses or one of these licenses:
+  - MIT License
+  - Microsoft Public License
+  - Beerware License
+  - Academic Free License
+  - WTFPL
+  - Unlicense
+  - Original BSD license
+  - Modified BSD License
+  - Simplified BSD License
+  - Zero Clause BSD
+- Link the product source code with an another product source code if between them no any patent collision
 
 This license is require to:
-1. Keep the full license text without any changes
-2. The license text must be included once in a file called 'License' which placed in the root directory of the software and in all source files of the software
+
+- Keep the full license text without any changes
+- The license text must be included once in a file called 'License' which placed in the root directory of the product and in all source files of the product
 
 This license is deny to:
-1. Change license of the derivative software
-2. Use the copyright holder name and name of any contributor of this software for advertising derivative software without legally certified permission
-3. Sell this software without an author legally certified permission
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+- Change license of the derivative product
+- Use the product’s author name and name of any contributor of this product for advertising derivative software without legally certified permission
+- Resell this product
+- Use the product or the product source code for any purpose which refers to any government of any country
+
+The product is an original source codes and original compiled files which made by the original author and provided only under the grants and restrictions of this license. All damages which can be happen after and while using the product will not be compensate.
 */
 
 #pragma once
@@ -32,8 +41,8 @@ SOFTWARE.
 #include "CHeader.hpp"
 
 namespace Compendium {
-  typedef enum {
-    EC_INVALID_ARGUMENT = numeric_limits<long>::lowest(),
+  enum class ENErrorCodes: int64_t {
+    EC_INVALID_ARGUMENT = numeric_limits<int64_t>::lowest(),
     EC_INVALID_PATH,
     EC_INVALID_READ,
     EC_INVALID_PARSE,
@@ -48,57 +57,41 @@ namespace Compendium {
     EC_EMPTY_FILE,
 
     EC_OK = 0
-  } enErrorCode;
+  };
 
   class CUnit {
     public:
     explicit CUnit() noexcept;
     explicit CUnit( const CUnit &_Copy ) noexcept;
-    explicit CUnit( const wchar_t *_Id, const wchar_t *_Value ) noexcept;
+    explicit CUnit( const u32string &_Id, const u32string &_Value );
     ~CUnit();
 
-    inline wchar_t *fGetId() const noexcept {
-      return vId;
+    inline u32string FGetId() const noexcept {
+      return VId;
     }
 
-    inline void fSetId( const wchar_t *_Id ) noexcept {
-      fClearId();
-
-      size_t vSourceSize = wcslen( _Id ) + 1;
-
-      vId = new wchar_t [ vSourceSize ];
-      wcscpy_s( vId, vSourceSize, _Id );
+    void FSetId( const u32string &_Id ) noexcept {
+      VId = _Id;
     }
 
-    inline wchar_t *fGetValue() const noexcept {
-      return vValue;
+    inline u32string FGetValue() const noexcept {
+      return VValue;
     }
 
-    inline void fSetValue( const wchar_t *_Value ) noexcept {
-      fClearValue();
-
-      size_t vSourceSize = wcslen( _Value ) + 1;
-
-      vValue = new wchar_t [ vSourceSize ];
-      wcscpy_s( vValue, vSourceSize, _Value );
+    inline void FSetValue( const char32_t *_Value ) noexcept {
+      VValue = _Value;
     }
 
     private:
-    wchar_t *vId;
-    wchar_t *vValue;
+    u32string VId;
+    u32string VValue;
 
-    inline void fClearId() {
-      if( vId != nullptr ) {
-        delete[] vId;
-        vId = nullptr;
-      }
+    inline void FClearId() {
+      VId.clear();
     }
 
-    inline void fClearValue() {
-      if( vValue != nullptr ) {
-        delete[] vValue;
-        vValue = nullptr;
-      }
+    inline void FClearValue() {
+      VValue.clear();
     }
   };
 
@@ -106,256 +99,102 @@ namespace Compendium {
     public:
     explicit CGroup() noexcept;
     explicit CGroup( const CGroup &_Copy ) noexcept;
-    explicit CGroup( const wchar_t *_Id ) noexcept;
-    explicit CGroup( const wchar_t *_Id,
-                     vector<CGroup *> _Groups, vector<CUnit *> _Units ) noexcept;
+    explicit CGroup( const u32string &_Id );
+    explicit CGroup( const u32string &_Id,
+                     const vector<CGroup *> &_Groups, const vector<CUnit *> &_Units );
     ~CGroup();
 
-    inline wchar_t *fGetId() const noexcept { return vId; }
-
-    inline void fSetId( const wchar_t *_Id ) noexcept {
-      fClearId();
-
-      size_t vSourceSize = wcslen( _Id ) + 1;
-
-      vId = new wchar_t [ vSourceSize ];
-      wcscpy_s( vId, vSourceSize, _Id );
+    inline u32string FGetId() const noexcept {
+      return VId;
     }
 
-    inline vector<CGroup *> fGetGroups() const { return vGroups; }
+    inline void FSetId( const u32string &_Id ) {
+      VId = _Id;
+    }
 
-    inline void fSetGroups( vector<CGroup *> _Groups ) noexcept { vGroups = _Groups; }
+    inline vector<CGroup *> FGetGroups() const noexcept {
+      return VGroups;
+    }
 
-    inline void fClearGroups() noexcept { vGroups.clear(); }
+    inline void FSetGroups( vector<CGroup *> &_Groups ) noexcept {
+      VGroups = _Groups;
+    }
 
-    inline vector<CUnit *> fGetUnits() const { return vUnits; }
+    inline void FClearGroups() noexcept {
+      VGroups.clear();
+    }
 
-    inline void fSetUnits( vector<CUnit *> _Units ) noexcept { vUnits = _Units; }
+    inline vector<CUnit *> FGetUnits() const noexcept {
+      return VUnits;
+    }
 
-    inline void fClearUnits() noexcept { vUnits.clear(); }
+    inline void FSetUnits( vector<CUnit *> &_Units ) noexcept {
+      VUnits = _Units;
+    }
+
+    inline void FClearUnits() noexcept {
+      VUnits.clear();
+    }
 
     //Units
 
-    inline CUnit *fGetUnit( const size_t _Index ) const {
-      if( _Index > vUnits.size() )
-        return nullptr;
+    CUnit *FGetUnit( const uint32_t _Index ) const;
+    CUnit *FGetUnit( const u32string &_Id, const bool _Deep = false ) const;
+    CUnit *FGetUnit( const CUnit *&_Unit, const bool _Deep = false ) const;
 
-      return vUnits [ _Index ];
-    }
+    ENErrorCodes FAddUnit( CUnit *&_Unit );
 
-    CUnit *fGetUnit( const wstring _Id, const bool _Deep = false ) const;
-    CUnit *fGetUnit( const wchar_t *_Value, const bool _Deep = false ) const;
-    CUnit *fGetUnit( const CUnit *_Unit, const bool _Deep = false ) const;
+    CUnit *FRemoveUnit( const uint32_t _Index );
+    CUnit *FRemoveUnit( const u32string &_Id, const bool _Deep = false );
 
-    inline enErrorCode fAddUnit( CUnit *_Unit ) {
-      if( _Unit == nullptr )
-        return EC_INVALID_ARGUMENT;
+    ENErrorCodes FInsertUnit( CUnit *&_Unit, const uint32_t _Index );
 
-      vUnits.push_back( _Unit );
+    int64_t FGetUnitIndex( const u32string &_Id ) const;
 
-      return EC_OK;
-    }
-
-    inline CUnit *fRemoveUnit( const size_t _Index ) {
-      if( _Index >= vUnits.size() )
-        return nullptr;
-
-      CUnit *vGetUnit = vUnits [ _Index ];
-
-      vUnits.erase( vUnits.begin() + static_cast< vector<CUnit *>::difference_type >( _Index ) );
-
-      return vGetUnit;
-    }
-
-    CUnit *fRemoveUnit( const wstring _Id, const bool _Deep = false );
-    CUnit *fRemoveUnit( const wchar_t *_Value, const bool _Deep = false );
-
-    inline enErrorCode fInsertUnit( CUnit *_Unit, const size_t _Index ) {
-      if( _Unit == nullptr || _Index >= vUnits.size() )
-        return EC_INVALID_ARGUMENT;
-
-      vUnits.insert( vUnits.begin() + static_cast< vector<CUnit *>::difference_type >( _Index ), _Unit );
-
-      return EC_OK;
-    }
-
-    inline long fGetUnitIndex( const wstring _Id ) const {
-      for( size_t c = 0; c < vUnits.size(); c++ ) {
-        if( wcscmp( vUnits [ c ]->fGetId(), _Id.data() ) == 0 )
-          return static_cast< long >( c );
-      }
-
-      return EC_UNIT_NOT_FOUND;
-    }
-
-    inline long fGetUnitIndex( const wchar_t *_Value ) const {
-      if( _Value == nullptr )
-        return EC_INVALID_ARGUMENT;
-
-      for( size_t c = 0; c < vUnits.size(); c++ ) {
-        if( wcscmp( vUnits [ c ]->fGetValue(), _Value ) == 0 )
-          return static_cast< long >( c );
-      }
-
-      return EC_UNIT_NOT_FOUND;
-    }
-
-    inline CUnit *fChangeUnit( const size_t _Index, CUnit *_Substitute ) {
-      if( _Index >= vUnits.size() || _Substitute == nullptr )
-        return nullptr;
-
-      CUnit *vGetUnit = vUnits [ _Index ];
-
-      vUnits [ _Index ] = _Substitute;
-
-      return vGetUnit;
-    }
-
-    CUnit *fChangeUnit( const wstring _Id, CUnit *_Substitute, const bool _Deep = false );
-    CUnit *fChangeUnit( const wchar_t *_Value, CUnit *_Substitute, const bool _Deep = false );
+    CUnit *FChangeUnit( const uint32_t _Index, CUnit *&_Substitute );
+    CUnit *FChangeUnit( const u32string &_Id, CUnit *&_Substitute, const bool _Deep = false );
 
     //Groups
 
-    inline CGroup *fGetGroup( const size_t _Index ) const {
-      if( _Index >= vGroups.size() )
-        return nullptr;
+    CGroup *FGetGroup( const uint32_t _Index ) const;
+    CGroup *FGetGroup( const u32string &_Id, const bool _Deep = false ) const;
+    CGroup *FGetGroup( const CUnit *&_Unit, const bool _Deep = false ) const;
+    CGroup *FGetGroup( const vector<CUnit *> &_Units, const bool _Deep = false ) const;
+    CGroup *FGetGroup( const CGroup *&_Group, const bool _Deep = false ) const;
+    CGroup *FGetGroup( const vector<CGroup *> &_Groups, const bool _Deep = false ) const;
 
-      return vGroups [ _Index ];
-    }
+    ENErrorCodes FAddGroup( CGroup *&_Group );
 
-    CGroup *fGetGroup( const wchar_t *_Id, const bool _Deep = false ) const;
-    CGroup *fGetGroup( const CUnit *_Unit, const bool _Deep = false ) const;
-    CGroup *fGetGroup( const vector<CUnit *> _Units, const bool _Deep = false ) const;
-    CGroup *fGetGroup( const CGroup *_Group, const bool _Deep = false ) const;
-    CGroup *fGetGroup( const vector<CGroup *> _Groups, const bool _Deep = false ) const;
+    CGroup *FRemoveGroup( const uint32_t _Index );
+    CGroup *FRemoveGroup( const u32string &_Id, const bool _Deep = false );
+    CGroup *FRemoveGroup( const CUnit *&_Unit, const bool _Deep = false );
+    CGroup *FRemoveGroup( const vector<CUnit *> &_Units, const bool _Deep = false );
+    CGroup *FRemoveGroup( const CGroup *&_Group, const bool _Deep = false );
+    CGroup *FRemoveGroup( const vector<CGroup *> &_Groups, const bool _Deep = false );
 
-    inline enErrorCode fAddGroup( CGroup *_Group ) {
-      if( _Group == nullptr )
-        return EC_INVALID_ARGUMENT;
+    ENErrorCodes FInsertGroup( CGroup *&_Group, const uint32_t _Index );
 
-      vGroups.push_back( _Group );
+    int64_t FGetGroupIndex( const u32string &_Id ) const;
+    int64_t FGetGroupIndex( const CUnit *&_Unit ) const;
+    int64_t FGetGroupIndex( const vector<CUnit *> &_Units ) const;
+    int64_t FGetGroupIndex( const CGroup *&_Group ) const;
+    int64_t FGetGroupIndex( const vector<CGroup *> &_Groups ) const;
 
-      return EC_OK;
-    }
-
-    inline CGroup *fRemoveGroup( const size_t _Index ) {
-      if( _Index >= vGroups.size() )
-        return nullptr;
-
-      CGroup *vGetGroup = vGroups [ _Index ];
-
-      vGroups.erase( vGroups.begin() + static_cast< vector<CGroup *>::difference_type >( _Index ) );
-
-      return vGetGroup;
-    }
-
-    CGroup *fRemoveGroup( const wchar_t *_Id, const bool _Deep = false );
-    CGroup *fRemoveGroup( const CUnit *_Unit, const bool _Deep = false );
-    CGroup *fRemoveGroup( const vector<CUnit *> _Units, const bool _Deep = false );
-    CGroup *fRemoveGroup( const CGroup *_Group, const bool _Deep = false );
-    CGroup *fRemoveGroup( const vector<CGroup *> _Groups, const bool _Deep = false );
-
-    inline enErrorCode fInsertGroup( CGroup *_Group, const size_t _Index ) {
-      if( _Group == nullptr || _Index >= vGroups.size() )
-        return EC_INVALID_ARGUMENT;
-
-      vGroups.insert( vGroups.begin() + static_cast< vector<CGroup *>::difference_type >( _Index ), _Group );
-
-      return EC_OK;
-    }
-
-    inline long fGetGroupIndex( const wchar_t *_Id ) const {
-      if( _Id == nullptr )
-        return EC_INVALID_ARGUMENT;
-
-      for( size_t c = 0; c < vGroups.size(); c++ ) {
-        if( wcscmp( vGroups [ c ]->fGetId(), _Id ) == 0 )
-          return static_cast< long >( c );
-      }
-
-      return EC_GROUP_NOT_FOUND;
-    }
-
-    inline long fGetGroupIndex( const CUnit *_Unit ) const {
-      if( _Unit == nullptr )
-        return EC_INVALID_ARGUMENT;
-
-      for( size_t c = 0; c < vGroups.size(); c++ ) {
-        if( vGroups [ c ]->fGetUnit( _Unit ) != nullptr )
-          return static_cast< long >( c );
-      }
-
-      return EC_GROUP_NOT_FOUND;
-    }
-
-    inline long fGetGroupIndex( const vector<CUnit *> _Units ) const {
-      if( _Units.empty() )
-        return EC_INVALID_ARGUMENT;
-
-      for( size_t c = 0; c < vGroups.size(); c++ ) {
-        for( const CUnit *vUnit : _Units ) {
-          if( vGroups [ c ]->fGetUnit( vUnit ) != nullptr )
-            return static_cast< long >( c );
-        }
-      }
-
-      return EC_GROUP_NOT_FOUND;
-    }
-
-    inline long fGetGroupIndex( const CGroup *_Group ) const {
-      if( _Group == nullptr )
-        return EC_INVALID_ARGUMENT;
-
-      for( size_t c = 0; c < vGroups.size(); c++ ) {
-        if( vGroups [ c ]->fGetGroup( _Group ) != nullptr )
-          return static_cast< long >( c );
-      }
-
-      return EC_GROUP_NOT_FOUND;
-    }
-
-    inline long fGetGroupIndex( const vector<CGroup *> _Groups ) const {
-      if( _Groups.empty() )
-        return EC_INVALID_ARGUMENT;
-
-      for( size_t c = 0; c < vGroups.size(); c++ ) {
-        for( const CGroup *vGroup : _Groups ) {
-          if( vGroups [ c ]->fGetGroup( vGroup ) != nullptr )
-            return static_cast< long >( c );
-        }
-      }
-
-      return EC_GROUP_NOT_FOUND;
-    }
-
-    inline CGroup *fChangeGroup( const size_t _Index, CGroup *_Substitute ) {
-      if( _Index >= vGroups.size() || _Substitute == nullptr )
-        return nullptr;
-
-      CGroup *vGetGroup = vGroups [ _Index ];
-
-      vGroups [ _Index ] = _Substitute;
-
-      return vGetGroup;
-    }
-
-    CGroup *fChangeGroup( const wchar_t *_Id, CGroup *_Substitute, const bool _Deep = false );
-    CGroup *fChangeGroup( const CUnit *_Unit, CGroup *_Substitute, const bool _Deep = false );
-    CGroup *fChangeGroup( const vector<CUnit *> _Units, CGroup *_Substitute, const bool _Deep = false );
-    CGroup *fChangeGroup( const CGroup *_Group, CGroup *_Substitute, const bool _Deep = false );
-    CGroup *fChangeGroup( const vector<CGroup *> _Groups, CGroup *_Substitute, const bool _Deep = false );
+    CGroup *FChangeGroup( const uint32_t _Index, CGroup *&_Substitute );
+    CGroup *FChangeGroup( const u32string &_Id, CGroup *&_Substitute, const bool _Deep = false );
+    CGroup *FChangeGroup( const CUnit *&_Unit, CGroup *&_Substitute, const bool _Deep = false );
+    CGroup *FChangeGroup( const vector<CUnit *> &_Units, CGroup *&_Substitute, const bool _Deep = false );
+    CGroup *FChangeGroup( const CGroup *&_Group, CGroup *&_Substitute, const bool _Deep = false );
+    CGroup *FChangeGroup( const vector<CGroup *> &_Groups, CGroup *&_Substitute, const bool _Deep = false );
 
     private:
-    wchar_t *vId;
+    u32string VId;
 
-    vector<CGroup *> vGroups;
-    vector<CUnit *> vUnits;
+    vector<CGroup *> VGroups;
+    vector<CUnit *> VUnits;
 
-    inline void fClearId() {
-      if( vId != nullptr ) {
-        delete[] vId;
-        vId = nullptr;
-      }
+    inline void FClearId() {
+      VId.clear();
     }
   };
 
@@ -364,76 +203,68 @@ namespace Compendium {
     explicit CConfigurator() noexcept;
     ~CConfigurator();
 
-    inline wchar_t *fGetBuffer() const noexcept { return vBuffer; }
-
-    enErrorCode fLoadBuffer( const wstring _Path );
-    enErrorCode fLoadBuffer( const wchar_t *_Buffer );
-
-    enErrorCode fLoadConfiguration( const wstring _Path );
-    enErrorCode fLoadConfiguration( const wchar_t *_Buffer, const size_t _StartIndex );
-
-    enErrorCode fSaveConfiguration( const wstring _Path );
-
-    enErrorCode fSaveBuffer( wstring &_Buffer );
-
-    inline vector<CGroup *> fGetGroups() const noexcept {
-      return vGroups;
+    inline u32string FGetBuffer() const noexcept {
+      return VBuffer;
     }
 
-    inline void fSetGroups( vector<CGroup *> _Groups ) noexcept { vGroups = _Groups; }
+    ENErrorCodes FLoadBufferFromFile( const u32string &_Path );
+    ENErrorCodes FLoadBufferFromBuffer( const u32string &_Buffer );
 
-    inline void fClearGroups() noexcept { vGroups.clear(); }
+    ENErrorCodes FLoadConfigurationFromFile( const u32string &_Path );
+    ENErrorCodes FLoadConfigurationFromBuffer( const u32string &_Buffer, const uint32_t _StartIndex );
 
-    inline vector<CUnit *> fGetUnits() const noexcept { return vUnits; }
+    ENErrorCodes FSaveConfigurationToFile( const u32string &_Path );
+    ENErrorCodes FSaveConfigurationToBuffer( u32string &_Path );
 
-    inline void fSetUnits( vector<CUnit *> _Units ) noexcept { vUnits = _Units; }
+    inline vector<CGroup *> FGetGroups() const noexcept {
+      return VGroups;
+    }
+    inline void FSetGroups( vector<CGroup *> &_Groups ) noexcept {
+      VGroups = _Groups;
+    }
 
-    inline void fClearUnits() noexcept { vUnits.clear(); }
+    inline void FClearGroups() noexcept {
+      VGroups.clear();
+    }
+
+    inline vector<CUnit *> FGetUnits() const noexcept {
+      return VUnits;
+    }
+    inline void FSetUnits( vector<CUnit *> &_Units ) noexcept {
+      VUnits = _Units;
+    }
+
+    inline void FClearUnits() noexcept {
+      VUnits.clear();
+    }
 
     private:
-    const wchar_t *vDefaultExtension = L".cconf";
+    const char32_t *VDefaultExtension = U".compendium-configuration";
 
-    inline bool fIsCompendiumFile( const wstring _Path ) const noexcept {
-      wstring vGetExtension = path( _Path ).extension();
+    bool FIsCompendiumFile( const u32string &_Path ) const noexcept;
 
-      if( vGetExtension == vDefaultExtension )
-        return true;
+    u32string VBuffer;
 
-      return false;
+    inline void FClearBuffer() {
+      VBuffer.clear();
     }
 
-    wchar_t *vBuffer;
+    vector<CUnit *> VUnits;
+    vector<CGroup *> VGroups;
 
-    inline void fClearBuffer() {
-      if( vBuffer != nullptr ) {
-        delete[] vBuffer;
-        vBuffer = nullptr;
-      }
-    }
+    void FSkipComment( uint32_t &_Index ) noexcept;
 
-    vector<CUnit *> vUnits;
-    vector<CGroup *> vGroups;
-
-    inline void fSkipComment( size_t &_Index ) noexcept {
-      for( size_t c = _Index + 1; c < wcslen( vBuffer ); c++ ) {
-        if( vBuffer [ c ] == L'-' && vBuffer [ c + 1 ] == L'>' ) {
-          _Index = c + 2;
-          return;
-        }
-      }
-    }
-
-    typedef enum {
+    enum class ENKeywords: int64_t {
       K_GROUP,
       K_UNIT
-    } enKeyword;
+    };
 
-    long fGetNextKeyword( size_t &_Index ) const noexcept;
+    int64_t FGetNextKeyword( uint32_t &_Index ) const noexcept;
 
-    CGroup *fParseGroup( size_t &_Index );
-    CUnit *fParseUnit( size_t &_Index );
+    CGroup *FParseGroup( uint32_t &_Index );
+    CUnit *FParseUnit( uint32_t &_Index );
 
-    wstring fSerializeGroup( const CGroup *_Group, const size_t _Level ) const;
-    inline wstring fSerializeUnit( const CUnit *_Unit ) const { return wstring() + L"unit " + _Unit->fGetId() + L":" + _Unit->fGetValue() + L"\r\n"; }
+    u32string FSerializeGroup( const CGroup *&_Group, const uint32_t _Level ) const;
+    u32string FSerializeUnit( const CUnit *&_Unit ) const;
   };
 }

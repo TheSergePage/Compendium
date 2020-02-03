@@ -1,230 +1,210 @@
 /*
-© 2019, Dark Orb.
+© 2019, Serge Page.
 
-The license version - 1.0
+This license is hereby grants to any person who obtained a copy of this product or the product source files the next rights to:
 
-This license is hereby grants to any person who obtained a copy of this software the next rights to:
-1. Use and do reverse-engineering of compiled version of this software at no cost, without any restrictions, in non-commercial and commercial purposes
-2. Use source codes of this software at no cost but with the limitations - source codes available only for non-commercial, academic and / or scientific purposes
-3. Copy and distribute without any fee
-4. Create a copy of the original repository and / or create own derivative software for non-commercial,  academic and / or scientific purposes only
+- Use a compiled version of this product at no cost, without any restrictions, in non-commercial and commercial purposes
+- Do reverse-engineering of this product in non-commercial purposes only
+- Use source codes of this product at no cost but with the limitations - source codes available only for non-commercial, academic and / or scientific purposes
+- Copy and distribute without any fee
+- Copy of the original repository and / or create own derivative product for non-commercial,  academic and / or scientific purposes only
+- Link the product source code with an another product source code which licensed under any of Dark Orb licenses or one of these licenses:
+  - MIT License
+  - Microsoft Public License
+  - Beerware License
+  - Academic Free License
+  - WTFPL
+  - Unlicense
+  - Original BSD license
+  - Modified BSD License
+  - Simplified BSD License
+  - Zero Clause BSD
+- Link the product source code with an another product source code if between them no any patent collision
 
 This license is require to:
-1. Keep the full license text without any changes
-2. The license text must be included once in a file called 'License' which placed in the root directory of the software and in all source files of the software
+
+- Keep the full license text without any changes
+- The license text must be included once in a file called 'License' which placed in the root directory of the product and in all source files of the product
 
 This license is deny to:
-1. Change license of the derivative software
-2. Use the copyright holder name and name of any contributor of this software for advertising derivative software without legally certified permission
-3. Sell this software without an author legally certified permission
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+- Change license of the derivative product
+- Use the product’s author name and name of any contributor of this product for advertising derivative software without legally certified permission
+- Resell this product
+- Use the product or the product source code for any purpose which refers to any government of any country
+
+The product is an original source codes and original compiled files which made by the original author and provided only under the grants and restrictions of this license. All damages which can be happen after and while using the product will not be compensate.
 */
 
 #include "Compendium.hpp"
 
-using Compendium::enErrorCode;
+using Compendium::ENErrorCodes;
 
 using Compendium::CUnit;
 using Compendium::CGroup;
 
 CGroup::CGroup() noexcept:
-  vId( nullptr ) {}
+  VId( U"" ) {}
 
 CGroup::CGroup( const CGroup &_Copy ) noexcept:
-  vId( _Copy.fGetId() ),
-  vGroups( _Copy.fGetGroups() ), vUnits( _Copy.fGetUnits() ) {}
+  VId( _Copy.FGetId() ),
+  VGroups( _Copy.FGetGroups() ), VUnits( _Copy.FGetUnits() ) {}
 
-CGroup::CGroup( const wchar_t *_Id ) noexcept:
-  vId( nullptr ) {
-  if( _Id != nullptr ) {
-    size_t vSourceSize = wcslen( _Id ) + 1;
-    vId = new wchar_t [ vSourceSize ];
-    wcscpy_s( vId, vSourceSize, _Id );
-  }
-}
+CGroup::CGroup( const u32string &_Id ) :
+  VId( _Id ) {}
 
-CGroup::CGroup( const wchar_t *_Id,
-                vector<CGroup *> _Groups, vector<CUnit *> _Units ) noexcept:
-  vId( nullptr ), vGroups( _Groups ), vUnits( _Units ) {
-  if( _Id != nullptr ) {
-    size_t vSourceSize = wcslen( _Id ) + 1;
-    vId = new wchar_t [ wcslen( _Id ) + 1 ];
-    wcscpy_s( vId, vSourceSize, _Id );
-  }
-}
+CGroup::CGroup( const u32string &_Id,
+                const vector<CGroup *> &_Groups, const vector<CUnit *> &_Units ) :
+  VId( _Id ), VGroups( _Groups ), VUnits( _Units ) {}
 
 CGroup::~CGroup() {
-  fClearId();
+  FClearId();
 
-  vGroups.clear();
-  vUnits.clear();
+  VGroups.clear();
+  VUnits.clear();
 }
 
 //Units
 
-CUnit *CGroup::fGetUnit( const wstring _Id, const bool _Deep ) const {
-  for( CUnit *vUnit : vUnits ) {
-    if( vUnit->fGetId() == _Id )
-      return vUnit;
-  }
-
-  if( _Deep ) {
-    for( CGroup *vGroup : vGroups ) {
-      CUnit *vGetUnit = vGroup->fGetUnit( _Id, _Deep );
-
-      if( vGetUnit != nullptr )
-        return vGetUnit;
-    }
-  }
-
-  return nullptr;
-}
-
-CUnit *CGroup::fGetUnit( const wchar_t *_Value, const bool _Deep ) const {
-  if( _Value == nullptr )
+CUnit *CGroup::FGetUnit( const uint32_t _Index ) const {
+  if( _Index > VUnits.size() )
     return nullptr;
 
-  for( CUnit *vUnit : vUnits ) {
-    if( wcscmp( vUnit->fGetValue(), _Value ) != 0 )
-      return vUnit;
+  return VUnits [ _Index ];
+}
+
+CUnit *CGroup::FGetUnit( const u32string &_Id, const bool _Deep ) const {
+  for( CUnit *VUnit : VUnits ) {
+    if( VUnit->FGetId() == _Id )
+      return VUnit;
   }
 
   if( _Deep ) {
-    for( CGroup *vGroup : vGroups ) {
-      CUnit *vGetUnit = vGroup->fGetUnit( _Value, _Deep );
+    for( CGroup *VGroup : VGroups ) {
+      CUnit *VGetUnit = VGroup->FGetUnit( _Id, _Deep );
 
-      if( vGetUnit != nullptr )
-        return vGetUnit;
+      if( VGetUnit != nullptr )
+        return VGetUnit;
     }
   }
 
   return nullptr;
 }
 
-CUnit *CGroup::fGetUnit( const CUnit *_Unit, const bool _Deep ) const {
+CUnit *CGroup::FGetUnit( const CUnit *&_Unit, const bool _Deep ) const {
   if( _Unit == nullptr )
     return nullptr;
 
-  for( CUnit *vUnit : vUnits ) {
-    if( vUnit->fGetId() == _Unit->fGetId() &&
-        wcscmp( vUnit->fGetValue(), _Unit->fGetValue() ) == 0 )
-      return vUnit;
+  for( CUnit *VUnit : VUnits ) {
+    if( VUnit->FGetId() == _Unit->FGetId() &&
+        VUnit->FGetValue() == _Unit->FGetValue() )
+      return VUnit;
   }
 
   if( _Deep ) {
-    for( CGroup *vGroup : vGroups ) {
-      CUnit *vGetUnit = vGroup->fGetUnit( _Unit, _Deep );
+    for( CGroup *VGroup : VGroups ) {
+      CUnit *VGetUnit = VGroup->FGetUnit( _Unit, _Deep );
 
-      if( vGetUnit != nullptr )
-        return vGetUnit;
+      if( VGetUnit != nullptr )
+        return VGetUnit;
     }
   }
 
   return nullptr;
 }
 
-CUnit *CGroup::fRemoveUnit( const wstring _Id, const bool _Deep ) {
-  for( size_t c = 0; c < vUnits.size(); c++ ) {
-    if( vUnits [ c ]->fGetId() == _Id ) {
-      CUnit *vGetUnit = vUnits [ c ];
+CUnit *CGroup::FRemoveUnit( const u32string &_Id, const bool _Deep ) {
+  for( uint32_t c = 0; c < VUnits.size(); c++ ) {
+    if( VUnits [ c ]->FGetId() == _Id ) {
+      CUnit *VGetUnit = VUnits [ c ];
 
-      vUnits.erase( vUnits.begin() + static_cast< vector<CUnit *>::difference_type >( c ) );
+      VUnits.erase( VUnits.begin() + static_cast< vector<CUnit *>::difference_type >( c ) );
 
-      return vGetUnit;
+      return VGetUnit;
     }
   }
 
   if( _Deep ) {
-    for( CGroup *vGroup : vGroups ) {
-      CUnit *vGetUnit = vGroup->fRemoveUnit( _Id, _Deep );
+    for( CGroup *VGroup : VGroups ) {
+      CUnit *VGetUnit = VGroup->FRemoveUnit( _Id, _Deep );
 
-      if( vGetUnit != nullptr )
-        return vGetUnit;
+      if( VGetUnit != nullptr )
+        return VGetUnit;
     }
   }
 
   return nullptr;
 }
 
-CUnit *CGroup::fRemoveUnit( const wchar_t *_Value, const bool _Deep ) {
-  if( _Value == nullptr )
+ENErrorCodes CGroup::FAddUnit( CUnit *&_Unit ) {
+  if( _Unit == nullptr )
+    return ENErrorCodes::EC_INVALID_ARGUMENT;
+
+  VUnits.push_back( _Unit );
+
+  return ENErrorCodes::EC_OK;
+}
+
+CUnit *CGroup::FRemoveUnit( const uint32_t _Index ) {
+  if( _Index >= VUnits.size() )
     return nullptr;
 
-  for( size_t c = 0; c < vUnits.size(); c++ ) {
-    if( wcscmp( vUnits [ c ]->fGetValue(), _Value ) != 0 ) {
-      CUnit *vGetUnit = vUnits [ c ];
+  CUnit *VGetUnit = VUnits [ _Index ];
 
-      vUnits.erase( vUnits.begin() + static_cast< vector<CUnit *>::difference_type >( c ) );
+  VUnits.erase( VUnits.begin() + static_cast< vector<CUnit *>::difference_type >( _Index ) );
 
-      return vGetUnit;
-    }
-  }
-
-  if( _Deep ) {
-    for( CGroup *vGroup : vGroups ) {
-      CUnit *vGetUnit = vGroup->fRemoveUnit( _Value, _Deep );
-
-      if( vGetUnit != nullptr )
-        return vGetUnit;
-    }
-  }
-
-  return nullptr;
+  return VGetUnit;
 }
 
-CUnit *CGroup::fChangeUnit( const wstring _Id, CUnit *_Substitute, const bool _Deep ) {
+ENErrorCodes CGroup::FInsertUnit( CUnit *&_Unit, const uint32_t _Index ) {
+  if( _Unit == nullptr || _Index >= VUnits.size() )
+    return ENErrorCodes::EC_INVALID_ARGUMENT;
+
+  VUnits.insert( VUnits.begin() + static_cast< vector<CUnit *>::difference_type >( _Index ), _Unit );
+
+  return ENErrorCodes::EC_OK;
+}
+
+int64_t CGroup::FGetUnitIndex( const u32string &_Id ) const {
+  for( uint32_t c = 0; c < VUnits.size(); c++ ) {
+    if( VUnits [ c ]->FGetId() == _Id )
+      return static_cast< int64_t >( c );
+  }
+
+  return static_cast< int64_t >( ENErrorCodes::EC_UNIT_NOT_FOUND );
+}
+
+CUnit *CGroup::FChangeUnit( const uint32_t _Index, CUnit *&_Substitute ) {
+  if( _Index >= VUnits.size() || _Substitute == nullptr )
+    return nullptr;
+
+  CUnit *VGetUnit = VUnits [ _Index ];
+
+  VUnits [ _Index ] = _Substitute;
+
+  return VGetUnit;
+}
+
+CUnit *CGroup::FChangeUnit( const u32string &_Id, CUnit *&_Substitute, const bool _Deep ) {
   if( _Substitute == nullptr )
     return nullptr;
 
-  for( size_t c = 0; c < vUnits.size(); c++ ) {
-    if( wcscmp( vUnits [ c ]->fGetId(), _Id.data() ) == 0 ) {
-      CUnit *vGetUnit = vUnits [ c ];
+  for( uint32_t c = 0; c < VUnits.size(); c++ ) {
+    if( VUnits [ c ]->FGetId() == _Id ) {
+      CUnit *VGetUnit = VUnits [ c ];
 
-      vUnits [ c ] = _Substitute;
+      VUnits [ c ] = _Substitute;
 
-      return vGetUnit;
+      return VGetUnit;
     }
   }
 
   if( _Deep ) {
-    for( CGroup *vGroup : vGroups ) {
-      CUnit *vGetUnit = vGroup->fChangeUnit( _Id, _Substitute, _Deep );
+    for( CGroup *VGroup : VGroups ) {
+      CUnit *VGetUnit = VGroup->FChangeUnit( _Id, _Substitute, _Deep );
 
-      if( vGetUnit != nullptr )
-        return vGetUnit;
-    }
-  }
-
-  return nullptr;
-}
-
-CUnit *CGroup::fChangeUnit( const wchar_t *_Value, CUnit *_Substitute, const bool _Deep ) {
-  if( _Value == nullptr || _Substitute == nullptr )
-    return nullptr;
-
-  for( size_t c = 0; c < vUnits.size(); c++ ) {
-    if( wcscmp( vUnits [ c ]->fGetValue(), _Value ) == 0 ) {
-      CUnit *vGetUnit = vUnits [ c ];
-
-      vUnits [ c ] = _Substitute;
-
-      return vGetUnit;
-    }
-  }
-
-  if( _Deep ) {
-    for( CGroup *vGroup : vGroups ) {
-      CUnit *vGetUnit = vGroup->fChangeUnit( _Value, _Substitute, _Deep );
-
-      if( vGetUnit != nullptr )
-        return vGetUnit;
+      if( VGetUnit != nullptr )
+        return VGetUnit;
     }
   }
 
@@ -233,66 +213,73 @@ CUnit *CGroup::fChangeUnit( const wchar_t *_Value, CUnit *_Substitute, const boo
 
 //Groups
 
-CGroup *CGroup::fGetGroup( const wchar_t *_Id, const bool _Deep ) const {
-  if( _Id == nullptr )
+CGroup *CGroup::FGetGroup( const uint32_t _Index ) const {
+  if( _Index >= VGroups.size() )
     return nullptr;
 
-  for( CGroup *vGroup : vGroups ) {
-    if( wcscmp( vGroup->fGetId(), _Id ) == 0 )
-      return vGroup;
+  return VGroups [ _Index ];
+}
+
+CGroup *CGroup::FGetGroup( const u32string &_Id, const bool _Deep ) const {
+  if( _Id.empty() )
+    return nullptr;
+
+  for( CGroup *VGroup : VGroups ) {
+    if( VGroup->FGetId() == _Id )
+      return VGroup;
   }
 
   if( _Deep ) {
-    for( CGroup *vGroup : vGroups ) {
-      CGroup *vGetGroup = vGroup->fGetGroup( _Id, _Deep );
+    for( CGroup *VGroup : VGroups ) {
+      CGroup *VGetGroup = VGroup->FGetGroup( _Id, _Deep );
 
-      if( vGetGroup != nullptr )
-        return vGetGroup;
+      if( VGetGroup != nullptr )
+        return VGetGroup;
     }
   }
 
   return nullptr;
 }
 
-CGroup *CGroup::fGetGroup( const CUnit *_Unit, const bool _Deep ) const {
+CGroup *CGroup::FGetGroup( const CUnit *&_Unit, const bool _Deep ) const {
   if( _Unit == nullptr )
     return nullptr;
 
-  for( CGroup *vGroup : vGroups ) {
-    if( vGroup->fGetUnit( _Unit, _Deep ) != nullptr )
-      return vGroup;
+  for( CGroup *VGroup : VGroups ) {
+    if( VGroup->FGetUnit( _Unit, _Deep ) != nullptr )
+      return VGroup;
   }
 
   if( _Deep ) {
-    for( CGroup *vGroup : vGroups ) {
-      CGroup *vGetGroup = vGroup->fGetGroup( _Unit, _Deep );
+    for( CGroup *VGroup : VGroups ) {
+      CGroup *VGetGroup = VGroup->FGetGroup( _Unit, _Deep );
 
-      if( vGetGroup != nullptr )
-        return vGetGroup;
+      if( VGetGroup != nullptr )
+        return VGetGroup;
     }
   }
 
   return nullptr;
 }
 
-CGroup *CGroup::fGetGroup( const vector<CUnit *> _Units, const bool _Deep ) const {
+CGroup *CGroup::FGetGroup( const vector<CUnit *> &_Units, const bool _Deep ) const {
   if( _Units.empty() )
     return nullptr;
 
-  for( CGroup *vGroup : vGroups ) {
-    for( const CUnit *vUnit : _Units ) {
-      if( vGroup->fGetUnit( vUnit, _Deep ) != nullptr )
-        return vGroup;
+  for( CGroup *VGroup : VGroups ) {
+    for( const CUnit *VUnit : _Units ) {
+      if( VGroup->FGetUnit( VUnit, _Deep ) != nullptr )
+        return VGroup;
     }
   }
 
   if( _Deep ) {
-    for( CGroup *vGroup : vGroups ) {
-      for( const CUnit *vUnit : _Units ) {
-        CGroup *vGetGroup = vGroup->fGetGroup( vUnit, _Deep );
+    for( CGroup *VGroup : VGroups ) {
+      for( const CUnit *VUnit : _Units ) {
+        CGroup *VGetGroup = VGroup->FGetGroup( VUnit, _Deep );
 
-        if( vGetGroup != nullptr )
-          return vGetGroup;
+        if( VGetGroup != nullptr )
+          return VGetGroup;
       }
     }
   }
@@ -300,45 +287,45 @@ CGroup *CGroup::fGetGroup( const vector<CUnit *> _Units, const bool _Deep ) cons
   return nullptr;
 }
 
-CGroup *CGroup::fGetGroup( const CGroup *_Group, const bool _Deep ) const {
+CGroup *CGroup::FGetGroup( const CGroup *&_Group, const bool _Deep ) const {
   if( _Group == nullptr )
     return nullptr;
 
-  for( CGroup *vGroup : vGroups ) {
-    if( vGroup->fGetGroup( _Group, _Deep ) != nullptr )
-      return vGroup;
+  for( CGroup *VGroup : VGroups ) {
+    if( VGroup->FGetGroup( _Group, _Deep ) != nullptr )
+      return VGroup;
   }
 
   if( _Deep ) {
-    for( CGroup *vGroup : vGroups ) {
-      CGroup *vGetGroup = vGroup->fGetGroup( _Group, _Deep );
+    for( CGroup *VGroup : VGroups ) {
+      CGroup *VGetGroup = VGroup->FGetGroup( _Group, _Deep );
 
-      if( vGetGroup != nullptr )
-        return vGetGroup;
+      if( VGetGroup != nullptr )
+        return VGetGroup;
     }
   }
 
   return nullptr;
 }
 
-CGroup *CGroup::fGetGroup( const vector<CGroup *> _Groups, const bool _Deep ) const {
+CGroup *CGroup::FGetGroup( const vector<CGroup *> &_Groups, const bool _Deep ) const {
   if( _Groups.empty() )
     return nullptr;
 
-  for( CGroup *vGroup : vGroups ) {
-    for( const CGroup *vInnerGroup : _Groups ) {
-      if( vGroup->fGetGroup( vInnerGroup, _Deep ) != nullptr )
-        return vGroup;
+  for( CGroup *VGroup : VGroups ) {
+    for( const CGroup *VInnerGroup : _Groups ) {
+      if( VGroup->FGetGroup( VInnerGroup, _Deep ) != nullptr )
+        return VGroup;
     }
   }
 
   if( _Deep ) {
-    for( CGroup *vGroup : vGroups ) {
-      for( const CGroup *vInnerGroup : _Groups ) {
-        CGroup *vGetGroup = vGroup->fGetGroup( vInnerGroup, _Deep );
+    for( CGroup *VGroup : VGroups ) {
+      for( const CGroup *VInnerGroup : _Groups ) {
+        CGroup *VGetGroup = VGroup->FGetGroup( VInnerGroup, _Deep );
 
-        if( vGetGroup != nullptr )
-          return vGetGroup;
+        if( VGetGroup != nullptr )
+          return VGetGroup;
       }
     }
   }
@@ -346,81 +333,101 @@ CGroup *CGroup::fGetGroup( const vector<CGroup *> _Groups, const bool _Deep ) co
   return nullptr;
 }
 
-CGroup *CGroup::fRemoveGroup( const wchar_t *_Id, const bool _Deep ) {
-  if( _Id == nullptr )
+ENErrorCodes CGroup::FAddGroup( CGroup *&_Group ) {
+  if( _Group == nullptr )
+    return ENErrorCodes::EC_INVALID_ARGUMENT;
+
+  VGroups.push_back( _Group );
+
+  return ENErrorCodes::EC_OK;
+}
+
+CGroup *CGroup::FRemoveGroup( const uint32_t _Index ) {
+  if( _Index >= VGroups.size() )
     return nullptr;
 
-  for( size_t c = 0; c < vGroups.size(); c++ ) {
-    if( wcscmp( vGroups [ c ]->fGetId(), _Id ) == 0 ) {
-      CGroup *vGetGroup = vGroups [ c ];
+  CGroup *VGetGroup = VGroups [ _Index ];
 
-      vGroups.erase( vGroups.begin() + static_cast< vector<CGroup *>::difference_type >( c ) );
+  VGroups.erase( VGroups.begin() + static_cast< vector<CGroup *>::difference_type >( _Index ) );
 
-      return vGetGroup;
+  return VGetGroup;
+}
+
+CGroup *CGroup::FRemoveGroup( const u32string &_Id, const bool _Deep ) {
+  if( _Id.empty() )
+    return nullptr;
+
+  for( uint32_t c = 0; c < VGroups.size(); c++ ) {
+    if( VGroups [ c ]->FGetId() == _Id ) {
+      CGroup *VGetGroup = VGroups [ c ];
+
+      VGroups.erase( VGroups.begin() + static_cast< vector<CGroup *>::difference_type >( c ) );
+
+      return VGetGroup;
     }
   }
 
   if( _Deep ) {
-    for( CGroup *vGroup : vGroups ) {
-      CGroup *vGetGroup = vGroup->fRemoveGroup( _Id, _Deep );
+    for( CGroup *VGroup : VGroups ) {
+      CGroup *VGetGroup = VGroup->FRemoveGroup( _Id, _Deep );
 
-      if( vGetGroup != nullptr )
-        return vGetGroup;
+      if( VGetGroup != nullptr )
+        return VGetGroup;
     }
   }
 
   return nullptr;
 }
 
-CGroup *CGroup::fRemoveGroup( const CUnit *_Unit, const bool _Deep ) {
+CGroup *CGroup::FRemoveGroup( const CUnit *&_Unit, const bool _Deep ) {
   if( _Unit == nullptr )
     return nullptr;
 
-  for( size_t c = 0; c < vGroups.size(); c++ ) {
-    if( vGroups [ c ]->fGetUnit( _Unit, _Deep ) != nullptr ) {
-      CGroup *vGetGroup = vGroups [ c ];
+  for( uint32_t c = 0; c < VGroups.size(); c++ ) {
+    if( VGroups [ c ]->FGetUnit( _Unit, _Deep ) != nullptr ) {
+      CGroup *VGetGroup = VGroups [ c ];
 
-      vGroups.erase( vGroups.begin() + static_cast< vector<CGroup *>::difference_type >( c ) );
+      VGroups.erase( VGroups.begin() + static_cast< vector<CGroup *>::difference_type >( c ) );
 
-      return vGetGroup;
+      return VGetGroup;
     }
   }
 
   if( _Deep ) {
-    for( CGroup *vGroup : vGroups ) {
-      CGroup *vGetGroup = vGroup->fRemoveGroup( _Unit, _Deep );
+    for( CGroup *VGroup : VGroups ) {
+      CGroup *VGetGroup = VGroup->FRemoveGroup( _Unit, _Deep );
 
-      if( vGetGroup != nullptr )
-        return vGetGroup;
+      if( VGetGroup != nullptr )
+        return VGetGroup;
     }
   }
 
   return nullptr;
 }
 
-CGroup *CGroup::fRemoveGroup( const vector<CUnit *> _Units, const bool _Deep ) {
+CGroup *CGroup::FRemoveGroup( const vector<CUnit *> &_Units, const bool _Deep ) {
   if( _Units.empty() )
     return nullptr;
 
-  for( size_t c = 0; c < vGroups.size(); c++ ) {
-    for( const CUnit *vUnit : _Units ) {
-      if( vGroups [ c ]->fGetUnit( vUnit, _Deep ) != nullptr ) {
-        CGroup *vGetGroup = vGroups [ c ];
+  for( uint32_t c = 0; c < VGroups.size(); c++ ) {
+    for( const CUnit *VUnit : _Units ) {
+      if( VGroups [ c ]->FGetUnit( VUnit, _Deep ) != nullptr ) {
+        CGroup *VGetGroup = VGroups [ c ];
 
-        vGroups.erase( vGroups.begin() + static_cast< vector<CGroup *>::difference_type >( c ) );
+        VGroups.erase( VGroups.begin() + static_cast< vector<CGroup *>::difference_type >( c ) );
 
-        return vGetGroup;
+        return VGetGroup;
       }
     }
   }
 
   if( _Deep ) {
-    for( CGroup *vGroup : vGroups ) {
-      for( const CUnit *vUnit : _Units ) {
-        CGroup *vGetGroup = vGroup->fRemoveGroup( vUnit, _Deep );
+    for( CGroup *VGroup : VGroups ) {
+      for( const CUnit *VUnit : _Units ) {
+        CGroup *VGetGroup = VGroup->FRemoveGroup( VUnit, _Deep );
 
-        if( vGetGroup != nullptr )
-          return vGetGroup;
+        if( VGetGroup != nullptr )
+          return VGetGroup;
       }
     }
   }
@@ -428,55 +435,55 @@ CGroup *CGroup::fRemoveGroup( const vector<CUnit *> _Units, const bool _Deep ) {
   return nullptr;
 }
 
-CGroup *CGroup::fRemoveGroup( const CGroup *_Group, const bool _Deep ) {
+CGroup *CGroup::FRemoveGroup( const CGroup *&_Group, const bool _Deep ) {
   if( _Group == nullptr )
     return nullptr;
 
-  for( size_t c = 0; c < vGroups.size(); c++ ) {
-    if( vGroups [ c ]->fGetGroup( _Group, _Deep ) != nullptr ) {
-      CGroup *vGetGroup = vGroups [ c ];
+  for( uint32_t c = 0; c < VGroups.size(); c++ ) {
+    if( VGroups [ c ]->FGetGroup( _Group, _Deep ) != nullptr ) {
+      CGroup *VGetGroup = VGroups [ c ];
 
-      vGroups.erase( vGroups.begin() + static_cast< vector<CGroup *>::difference_type >( c ) );
+      VGroups.erase( VGroups.begin() + static_cast< vector<CGroup *>::difference_type >( c ) );
 
-      return vGetGroup;
+      return VGetGroup;
     }
   }
 
   if( _Deep ) {
-    for( CGroup *vGroup : vGroups ) {
-      CGroup *vGetGroup = vGroup->fRemoveGroup( _Group, _Deep );
+    for( CGroup *VGroup : VGroups ) {
+      CGroup *VGetGroup = VGroup->FRemoveGroup( _Group, _Deep );
 
-      if( vGetGroup != nullptr )
-        return vGetGroup;
+      if( VGetGroup != nullptr )
+        return VGetGroup;
     }
   }
 
   return nullptr;
 }
 
-CGroup *CGroup::fRemoveGroup( const vector<CGroup *> _Groups, const bool _Deep ) {
+CGroup *CGroup::FRemoveGroup( const vector<CGroup *> &_Groups, const bool _Deep ) {
   if( _Groups.empty() )
     return nullptr;
 
-  for( size_t c = 0; c < vGroups.size(); c++ ) {
-    for( const CGroup *vGroup : _Groups ) {
-      if( vGroups [ c ]->fGetGroup( vGroup, _Deep ) != nullptr ) {
-        CGroup *vGetGroup = vGroups [ c ];
+  for( uint32_t c = 0; c < VGroups.size(); c++ ) {
+    for( const CGroup *VGroup : _Groups ) {
+      if( VGroups [ c ]->FGetGroup( VGroup, _Deep ) != nullptr ) {
+        CGroup *VGetGroup = VGroups [ c ];
 
-        vGroups.erase( vGroups.begin() + static_cast< vector<CGroup *>::difference_type >( c ) );
+        VGroups.erase( VGroups.begin() + static_cast< vector<CGroup *>::difference_type >( c ) );
 
-        return vGetGroup;
+        return VGetGroup;
       }
     }
   }
 
   if( _Deep ) {
-    for( CGroup *vGroup : vGroups ) {
-      for( const CGroup *vInnerGroup : _Groups ) {
-        CGroup *vGetGroup = vGroup->fRemoveGroup( vInnerGroup, _Deep );
+    for( CGroup *VGroup : VGroups ) {
+      for( const CGroup *VInnerGroup : _Groups ) {
+        CGroup *VGetGroup = VGroup->FRemoveGroup( VInnerGroup, _Deep );
 
-        if( vGetGroup != nullptr )
-          return vGetGroup;
+        if( VGetGroup != nullptr )
+          return VGetGroup;
       }
     }
   }
@@ -484,81 +491,165 @@ CGroup *CGroup::fRemoveGroup( const vector<CGroup *> _Groups, const bool _Deep )
   return nullptr;
 }
 
-CGroup *CGroup::fChangeGroup( const wchar_t *_Id, CGroup *_Substitute, const bool _Deep ) {
-  if( _Id == nullptr || _Substitute == nullptr )
+ENErrorCodes CGroup::FInsertGroup( CGroup *&_Group, const uint32_t _Index ) {
+  if( _Group == nullptr || _Index >= VGroups.size() )
+    return ENErrorCodes::EC_INVALID_ARGUMENT;
+
+  VGroups.insert( VGroups.begin() + static_cast< vector<CGroup *>::difference_type >( _Index ), _Group );
+
+  return ENErrorCodes::EC_OK;
+}
+
+int64_t CGroup::FGetGroupIndex( const u32string &_Id ) const {
+  if( _Id.empty() )
+    return static_cast< int64_t >( ENErrorCodes::EC_INVALID_ARGUMENT );
+
+  for( uint32_t c = 0; c < VGroups.size(); c++ ) {
+    if( VGroups [ c ]->FGetId() == _Id )
+      return static_cast< int64_t >( c );
+  }
+
+  return static_cast< int64_t >( ENErrorCodes::EC_GROUP_NOT_FOUND );
+}
+
+int64_t CGroup::FGetGroupIndex( const CUnit *&_Unit ) const {
+  if( _Unit == nullptr )
+    return static_cast< int64_t >( ENErrorCodes::EC_INVALID_ARGUMENT );
+
+  for( uint32_t c = 0; c < VGroups.size(); c++ ) {
+    if( VGroups [ c ]->FGetUnit( _Unit ) != nullptr )
+      return static_cast< int64_t >( c );
+  }
+
+  return static_cast< int64_t >( ENErrorCodes::EC_GROUP_NOT_FOUND );
+}
+
+int64_t CGroup::FGetGroupIndex( const vector<CUnit *> &_Units ) const {
+  if( _Units.empty() )
+    return static_cast< int64_t >( ENErrorCodes::EC_INVALID_ARGUMENT );
+
+  for( uint32_t c = 0; c < VGroups.size(); c++ ) {
+    for( const CUnit *VUnit : _Units ) {
+      if( VGroups [ c ]->FGetUnit( VUnit ) != nullptr )
+        return static_cast< int64_t >( c );
+    }
+  }
+
+  return static_cast< int64_t >( ENErrorCodes::EC_GROUP_NOT_FOUND );
+}
+
+int64_t CGroup::FGetGroupIndex( const CGroup *&_Group ) const {
+  if( _Group == nullptr )
+    return static_cast< int64_t >( ENErrorCodes::EC_INVALID_ARGUMENT );
+
+  for( uint32_t c = 0; c < VGroups.size(); c++ ) {
+    if( VGroups [ c ]->FGetGroup( _Group ) != nullptr )
+      return static_cast< int64_t >( c );
+  }
+
+  return static_cast< int64_t >( ENErrorCodes::EC_GROUP_NOT_FOUND );
+}
+
+int64_t CGroup::FGetGroupIndex( const vector<CGroup *> &_Groups ) const {
+  if( _Groups.empty() )
+    return static_cast< int64_t >( ENErrorCodes::EC_INVALID_ARGUMENT );
+
+  for( uint32_t c = 0; c < VGroups.size(); c++ ) {
+    for( const CGroup *VGroup : _Groups ) {
+      if( VGroups [ c ]->FGetGroup( VGroup ) != nullptr )
+        return static_cast< int64_t >( c );
+    }
+  }
+
+  return static_cast< int64_t >( ENErrorCodes::EC_GROUP_NOT_FOUND );
+}
+
+CGroup *CGroup::FChangeGroup( const uint32_t _Index, CGroup *&_Substitute ) {
+  if( _Index >= VGroups.size() || _Substitute == nullptr )
     return nullptr;
 
-  for( size_t c = 0; c < vGroups.size(); c++ ) {
-    if( wcscmp( vGroups [ c ]->fGetId(), _Id ) == 0 ) {
-      CGroup *vGetGroup = vGroups [ c ];
+  CGroup *VGetGroup = VGroups [ _Index ];
 
-      vGroups [ c ] = _Substitute;
+  VGroups [ _Index ] = _Substitute;
 
-      return vGetGroup;
+  return VGetGroup;
+}
+
+CGroup *CGroup::FChangeGroup( const u32string &_Id, CGroup *&_Substitute, const bool _Deep ) {
+  if( _Id.empty() || _Substitute == nullptr )
+    return nullptr;
+
+  for( uint32_t c = 0; c < VGroups.size(); c++ ) {
+    if( VGroups [ c ]->FGetId() == _Id ) {
+      CGroup *VGetGroup = VGroups [ c ];
+
+      VGroups [ c ] = _Substitute;
+
+      return VGetGroup;
     }
   }
 
   if( _Deep ) {
-    for( CGroup *vGroup : vGroups ) {
-      CGroup *vGetGroup = vGroup->fChangeGroup( _Id, _Substitute, _Deep );
+    for( CGroup *VGroup : VGroups ) {
+      CGroup *VGetGroup = VGroup->FChangeGroup( _Id, _Substitute, _Deep );
 
-      if( vGetGroup != nullptr )
-        return vGetGroup;
+      if( VGetGroup != nullptr )
+        return VGetGroup;
     }
   }
 
   return nullptr;
 }
 
-CGroup *CGroup::fChangeGroup( const CUnit *_Unit, CGroup *_Substitute, const bool _Deep ) {
+CGroup *CGroup::FChangeGroup( const CUnit *&_Unit, CGroup *&_Substitute, const bool _Deep ) {
   if( _Unit == nullptr || _Substitute == nullptr )
     return nullptr;
 
-  for( size_t c = 0; c < vGroups.size(); c++ ) {
-    if( vGroups [ c ]->fGetUnit( _Unit ) != nullptr ) {
-      CGroup *vGetGroup = vGroups [ c ];
+  for( uint32_t c = 0; c < VGroups.size(); c++ ) {
+    if( VGroups [ c ]->FGetUnit( _Unit ) != nullptr ) {
+      CGroup *VGetGroup = VGroups [ c ];
 
-      vGroups [ c ] = _Substitute;
+      VGroups [ c ] = _Substitute;
 
-      return vGetGroup;
+      return VGetGroup;
     }
   }
 
   if( _Deep ) {
-    for( CGroup *vGroup : vGroups ) {
-      CGroup *vGetGroup = vGroup->fChangeGroup( _Unit, _Substitute, _Deep );
+    for( CGroup *VGroup : VGroups ) {
+      CGroup *VGetGroup = VGroup->FChangeGroup( _Unit, _Substitute, _Deep );
 
-      if( vGetGroup != nullptr )
-        return vGetGroup;
+      if( VGetGroup != nullptr )
+        return VGetGroup;
     }
   }
 
   return nullptr;
 }
 
-CGroup *CGroup::fChangeGroup( const vector<CUnit *> _Units, CGroup *_Substitute, const bool _Deep ) {
+CGroup *CGroup::FChangeGroup( const vector<CUnit *> &_Units, CGroup *&_Substitute, const bool _Deep ) {
   if( _Units.empty() || _Substitute == nullptr )
     return nullptr;
 
-  for( size_t c = 0; c < vGroups.size(); c++ ) {
-    for( const CUnit *vUnit : _Units ) {
-      if( vGroups [ c ]->fGetUnit( vUnit ) != nullptr ) {
-        CGroup *vGetGroup = vGroups [ c ];
+  for( uint32_t c = 0; c < VGroups.size(); c++ ) {
+    for( const CUnit *VUnit : _Units ) {
+      if( VGroups [ c ]->FGetUnit( VUnit ) != nullptr ) {
+        CGroup *VGetGroup = VGroups [ c ];
 
-        vGroups [ c ] = _Substitute;
+        VGroups [ c ] = _Substitute;
 
-        return vGetGroup;
+        return VGetGroup;
       }
     }
   }
 
   if( _Deep ) {
-    for( CGroup *vGroup : vGroups ) {
-      for( const CUnit *vUnit : vUnits ) {
-        CGroup *vGetGroup = vGroup->fChangeGroup( vUnit, _Substitute, _Deep );
+    for( CGroup *VGroup : VGroups ) {
+      for( const CUnit *VUnit : VUnits ) {
+        CGroup *VGetGroup = VGroup->FChangeGroup( VUnit, _Substitute, _Deep );
 
-        if( vGetGroup != nullptr )
-          return vGetGroup;
+        if( VGetGroup != nullptr )
+          return VGetGroup;
       }
     }
   }
@@ -566,55 +657,55 @@ CGroup *CGroup::fChangeGroup( const vector<CUnit *> _Units, CGroup *_Substitute,
   return nullptr;
 }
 
-CGroup *CGroup::fChangeGroup( const CGroup *_Group, CGroup *_Substitute, const bool _Deep ) {
+CGroup *CGroup::FChangeGroup( const CGroup *&_Group, CGroup *&_Substitute, const bool _Deep ) {
   if( _Group == nullptr || _Substitute == nullptr )
     return nullptr;
 
-  for( size_t c = 0; c < vGroups.size(); c++ ) {
-    if( vGroups [ c ]->fGetGroup( _Group ) != nullptr ) {
-      CGroup *vGetGroup = vGroups [ c ];
+  for( uint32_t c = 0; c < VGroups.size(); c++ ) {
+    if( VGroups [ c ]->FGetGroup( _Group ) != nullptr ) {
+      CGroup *VGetGroup = VGroups [ c ];
 
-      vGroups [ c ] = _Substitute;
+      VGroups [ c ] = _Substitute;
 
-      return vGetGroup;
+      return VGetGroup;
     }
   }
 
   if( _Deep ) {
-    for( CGroup *vGroup : vGroups ) {
-      CGroup *vGetGroup = vGroup->fChangeGroup( _Group, _Substitute, _Deep );
+    for( CGroup *VGroup : VGroups ) {
+      CGroup *VGetGroup = VGroup->FChangeGroup( _Group, _Substitute, _Deep );
 
-      if( vGetGroup != nullptr )
-        return vGetGroup;
+      if( VGetGroup != nullptr )
+        return VGetGroup;
     }
   }
 
   return nullptr;
 }
 
-CGroup *CGroup::fChangeGroup( const vector<CGroup *> _Groups, CGroup *_Substitute, const bool _Deep ) {
+CGroup *CGroup::FChangeGroup( const vector<CGroup *> &_Groups, CGroup *&_Substitute, const bool _Deep ) {
   if( _Groups.empty() || _Substitute == nullptr )
     return nullptr;
 
-  for( size_t c = 0; c < vGroups.size(); c++ ) {
-    for( const CGroup *vGroup : _Groups ) {
-      if( vGroups [ c ]->fGetGroup( vGroup ) != nullptr ) {
-        CGroup *vGetGroup = vGroups [ c ];
+  for( uint32_t c = 0; c < VGroups.size(); c++ ) {
+    for( const CGroup *VGroup : _Groups ) {
+      if( VGroups [ c ]->FGetGroup( VGroup ) != nullptr ) {
+        CGroup *VGetGroup = VGroups [ c ];
 
-        vGroups [ c ] = _Substitute;
+        VGroups [ c ] = _Substitute;
 
-        return vGetGroup;
+        return VGetGroup;
       }
     }
   }
 
   if( _Deep ) {
-    for( CGroup *vGroup : vGroups ) {
-      for( const CGroup *vInnerGroup : vGroups ) {
-        CGroup *vGetGroup = vGroup->fChangeGroup( vInnerGroup, _Substitute, _Deep );
+    for( CGroup *VGroup : VGroups ) {
+      for( const CGroup *VInnerGroup : VGroups ) {
+        CGroup *VGetGroup = VGroup->FChangeGroup( VInnerGroup, _Substitute, _Deep );
 
-        if( vGetGroup != nullptr )
-          return vGetGroup;
+        if( VGetGroup != nullptr )
+          return VGetGroup;
       }
     }
   }
