@@ -424,9 +424,10 @@
       <BrowseInformation>true</BrowseInformation>
       <CallingConvention>StdCall</CallingConvention>
       <FloatingPointModel>Strict</FloatingPointModel>
-      <SmallerTypeCheck>true</SmallerTypeCheck>
+      <SmallerTypeCheck>false</SmallerTypeCheck>
       <CustomUnityFile>false</CustomUnityFile>
       <AdditionalIncludeDirectories>..\Unicoder;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -619,9 +620,10 @@
       <BrowseInformation>true</BrowseInformation>
       <CallingConvention>StdCall</CallingConvention>
       <FloatingPointModel>Strict</FloatingPointModel>
-      <SmallerTypeCheck>true</SmallerTypeCheck>
+      <SmallerTypeCheck>false</SmallerTypeCheck>
       <CustomUnityFile>false</CustomUnityFile>
       <AdditionalIncludeDirectories>..\Unicoder;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
